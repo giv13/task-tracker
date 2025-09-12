@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,6 +24,16 @@ public class GlobalExceptionHandler implements ResponseBodyAdvice<Object> {
             errors.computeIfAbsent(error.getField(), k -> new ArrayList<>()).add(StringUtils.capitalize(Optional.ofNullable(error.getDefaultMessage()).orElse("")));
         });
         return Response.er(errors, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    private Response<String> onAuthenticationException(Exception exception) {
+        return Response.er(exception.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(Exception.class)
+    private Response<String> onException(Exception exception) {
+        return Response.er(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override

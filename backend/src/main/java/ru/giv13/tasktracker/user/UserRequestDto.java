@@ -13,24 +13,29 @@ import ru.giv13.tasktracker.validation.Unique;
 
 @Getter
 @Setter
-@GroupSequence({ UserRequestDto.class, UserRequestDto.FirstGroup.class, UserRequestDto.SecondGroup.class })
-@PasswordConfirmation(groups = UserRequestDto.FirstGroup.class)
+@PasswordConfirmation(groups = UserRequestDto.FirstGroupRegister.class)
 public class UserRequestDto implements PasswordConfirmable {
-    public interface FirstGroup {}
+    @GroupSequence({ UserRequestDto.FirstGroupRegister.class, UserRequestDto.SecondGroup.class })
+    public interface register {}
+    @GroupSequence({ UserRequestDto.FirstGroupLogin.class })
+    public interface login {}
+
+    public interface FirstGroupRegister extends FirstGroupLogin {}
+    public interface FirstGroupLogin {}
     public interface SecondGroup {}
 
-    @NotBlank(groups = FirstGroup.class)
-    @Size(max=50, groups = FirstGroup.class)
+    @NotBlank(groups = FirstGroupRegister.class)
+    @Size(max=50, groups = FirstGroupRegister.class)
     private String name;
 
-    @NotBlank(groups = FirstGroup.class)
-    @Email(groups = FirstGroup.class)
-    @Size(max=50, groups = FirstGroup.class)
+    @NotBlank(groups = FirstGroupLogin.class)
+    @Email(groups = FirstGroupLogin.class)
+    @Size(max=50, groups = FirstGroupLogin.class)
     @Unique(repository=UserRepository.class, field="email", groups = SecondGroup.class)
     private String email;
 
-    @NotBlank(groups = FirstGroup.class)
-    @Password(groups = FirstGroup.class)
+    @NotBlank(groups = FirstGroupLogin.class)
+    @Password(groups = FirstGroupRegister.class)
     private String password;
 
     private String passwordConfirmation;
