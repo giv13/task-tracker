@@ -1,11 +1,13 @@
 package ru.giv13.tasktracker.system;
 
+import io.jsonwebtoken.JwtException;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -28,6 +30,16 @@ public class GlobalExceptionHandler implements ResponseBodyAdvice<Object> {
 
     @ExceptionHandler(AuthenticationException.class)
     private Response<String> onAuthenticationException(Exception exception) {
+        return Response.er(exception.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(InsufficientAuthenticationException.class)
+    private Response<String> onInsufficientAuthenticationException() {
+        return Response.er("Для доступа к этому ресурсу требуется аутентификация", HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(JwtException.class)
+    private Response<String> onJwtException(Exception exception) {
         return Response.er(exception.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 

@@ -33,7 +33,7 @@ public class JwtService {
     @Value("${security.jwt.refresh.token-name}")
     private String jwtRefreshTokenName;
 
-    public String generateCookie(ru.giv13.tasktracker.user.User user) {
+    public String generateCookie(User user) {
         generateCookie(user, jwtTokenName, jwtExpiration);
         return generateCookie(user, jwtRefreshTokenName, jwtRefreshExpiration);
     }
