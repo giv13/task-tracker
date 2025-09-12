@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Task tracker | Мои задачи</title>
+  <link rel="icon" type="image/svg+xml" href="img/logo.svg">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+  <link rel="stylesheet" href="css/adminlte.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="hold-transition layout-top-nav">
+  <div class="wrapper">
+    <nav class="main-header navbar navbar-expand-md navbar-light navbar-white">
+      <div class="container-fluid">
+        <a href="/" class="navbar-brand">
+          <img src="img/logo.svg" alt="Task tracker" class="brand-image">
+          <span class="brand-text font-weight-light">Task tracker</span>
+        </a>
+        <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto">
+          <li class="nav-item dropdown user-menu">
+            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+              <span class="d-none d-md-inline">Alexander Pierce</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+              <li class="user-header bg-primary">
+                <p>
+                  Alexander Pierce
+                  <small>test@mail.ru</small>
+                </p>
+              </li>
+              <li class="user-footer">
+                <a href="#" class="btn btn-default btn-flat float-right">Выйти</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-widget="fullscreen" href="#" role="button">
+              <i class="fas fa-expand-arrows-alt"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="content-wrapper kanban">
+      <div class="content-header">
+        <div class="container-fluid">
+          <h1>Мои задачи</h1>
+        </div>
+      </div>
+      <section class="content pb-3">
+        <div class="container-fluid h-100">
+          <div class="card card-row card-secondary">
+            <div class="card-header">
+              <h3 class="card-title">
+                Backlog
+              </h3>
+            </div>
+            <div class="card-body">
+              <div class="card card-info card-outline">
+                <div class="card-header">
+                  <h5 class="card-title">Create Labels</h5>
+                  <div class="card-tools">
+                    <a href="#" class="btn btn-tool btn-link">#3</a>
+                    <a href="#" class="btn btn-tool">
+                      <i class="fas fa-pen"></i>
+                    </a>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="custom-control custom-checkbox">
+                    <input class="custom-control-input" type="checkbox" id="customCheckbox1" disabled>
+                    <label for="customCheckbox1" class="custom-control-label">Bug</label>
+                  </div>
+                  <div class="custom-control custom-checkbox">
+                    <input class="custom-control-input" type="checkbox" id="customCheckbox2" disabled>
+                    <label for="customCheckbox2" class="custom-control-label">Feature</label>
+                  </div>
+                  <div class="custom-control custom-checkbox">
+                    <input class="custom-control-input" type="checkbox" id="customCheckbox3" disabled>
+                    <label for="customCheckbox3" class="custom-control-label">Enhancement</label>
+                  </div>
+                  <div class="custom-control custom-checkbox">
+                    <input class="custom-control-input" type="checkbox" id="customCheckbox4" disabled>
+                    <label for="customCheckbox4" class="custom-control-label">Documentation</label>
+                  </div>
+                  <div class="custom-control custom-checkbox">
+                    <input class="custom-control-input" type="checkbox" id="customCheckbox5" disabled>
+                    <label for="customCheckbox5" class="custom-control-label">Examples</label>
+                  </div>
+                </div>
+              </div>
+              <div class="card card-primary card-outline">
+                <div class="card-header">
+                  <h5 class="card-title">Create Issue template</h5>
+                  <div class="card-tools">
+                    <a href="#" class="btn btn-tool btn-link">#4</a>
+                    <a href="#" class="btn btn-tool">
+                      <i class="fas fa-pen"></i>
+                    </a>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="custom-control custom-checkbox">
+                    <input class="custom-control-input" type="checkbox" id="customCheckbox1_1" disabled>
+                    <label for="customCheckbox1_1" class="custom-control-label">Bug Report</label>
+                  </div>
+                  <div class="custom-control custom-checkbox">
+                    <input class="custom-control-input" type="checkbox" id="customCheckbox1_2" disabled>
+                    <label for="customCheckbox1_2" class="custom-control-label">Feature Request</label>
+                  </div>
+                </div>
+              </div>
+              <div class="card card-primary card-outline">
+                <div class="card-header">
+                  <h5 class="card-title">Create PR template</h5>
+                  <div class="card-tools">
+                    <a href="#" class="btn btn-tool btn-link">#6</a>
+                    <a href="#" class="btn btn-tool">
+                      <i class="fas fa-pen"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div class="card card-light card-outline">
+                <div class="card-header">
+                  <h5 class="card-title">Create Actions</h5>
+                  <div class="card-tools">
+                    <a href="#" class="btn btn-tool btn-link">#7</a>
+                    <a href="#" class="btn btn-tool">
+                      <i class="fas fa-pen"></i>
+                    </a>
+                  </div>
+
+                </div>
+                <div class="card-body">
+                  <p>
+                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
+                    Aenean commodo ligula eget dolor. Aenean massa.
+                    Cum sociis natoque penatibus et magnis dis parturient montes,
+                    nascetur ridiculus mus.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card card-row card-primary">
+            <div class="card-header">
+              <h3 class="card-title">
+                To Do
+              </h3>
+            </div>
+            <div class="card-body">
+              <div class="card card-primary card-outline">
+                <div class="card-header">
+                  <h5 class="card-title">Create first milestone</h5>
+                  <div class="card-tools">
+                    <a href="#" class="btn btn-tool btn-link">#5</a>
+                    <a href="#" class="btn btn-tool">
+                      <i class="fas fa-pen"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card card-row card-default">
+            <div class="card-header bg-info">
+              <h3 class="card-title">
+                In Progress
+              </h3>
+            </div>
+            <div class="card-body">
+              <div class="card card-light card-outline">
+                <div class="card-header">
+                  <h5 class="card-title">Update Readme</h5>
+                  <div class="card-tools">
+                    <a href="#" class="btn btn-tool btn-link">#2</a>
+                    <a href="#" class="btn btn-tool">
+                      <i class="fas fa-pen"></i>
+                    </a>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <p>
+                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
+                    Aenean commodo ligula eget dolor. Aenean massa.
+                    Cum sociis natoque penatibus et magnis dis parturient montes,
+                    nascetur ridiculus mus.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card card-row card-success">
+            <div class="card-header">
+              <h3 class="card-title">
+                Done
+              </h3>
+            </div>
+            <div class="card-body">
+              <div class="card card-primary card-outline">
+                <div class="card-header">
+                  <h5 class="card-title">Create repo</h5>
+                  <div class="card-tools">
+                    <a href="#" class="btn btn-tool btn-link">#1</a>
+                    <a href="#" class="btn btn-tool">
+                      <i class="fas fa-pen"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <footer class="main-footer">
+      <strong>© 2025 <a href="/" target="_blank">Task tracker</a></strong>. Все права защищены.
+    </footer>
+  </div>
+
+  <script src="plugins/jquery/jquery.min.js"></script>
+  <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="js/adminlte.min.js"></script>
+</body>
+</html>

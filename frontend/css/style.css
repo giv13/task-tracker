@@ -1,0 +1,4 @@
+.navbar-nav > .user-menu > .dropdown-menu > li.user-header {
+    height: auto;
+    border-bottom: 10px solid transparent;
+}
