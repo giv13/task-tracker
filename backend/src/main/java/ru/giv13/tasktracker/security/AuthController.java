@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.giv13.tasktracker.user.UserRequestDto;
+import ru.giv13.tasktracker.user.UserResponseDto;
 
 @RestController
 @RequestMapping("auth")
@@ -16,13 +17,13 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("register")
-    public void register(@Validated(UserRequestDto.register.class) @RequestBody UserRequestDto userRequestDto) {
-        authService.register(userRequestDto);
+    public UserResponseDto register(@Validated(UserRequestDto.register.class) @RequestBody UserRequestDto userRequestDto) {
+        return authService.register(userRequestDto);
     }
 
     @PostMapping("login")
-    public void login(@Validated(UserRequestDto.login.class) @RequestBody UserRequestDto userRequestDto) {
-        authService.login(userRequestDto);
+    public UserResponseDto login(@Validated(UserRequestDto.login.class) @RequestBody UserRequestDto userRequestDto) {
+        return authService.login(userRequestDto);
     }
 
     @PostMapping("refresh")

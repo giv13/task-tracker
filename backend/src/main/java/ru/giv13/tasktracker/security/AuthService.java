@@ -10,10 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.giv13.tasktracker.user.User;
-import ru.giv13.tasktracker.user.UserRepository;
-import ru.giv13.tasktracker.user.UserRequestDto;
-import ru.giv13.tasktracker.user.UserService;
+import ru.giv13.tasktracker.user.*;
 
 @Service
 @RequiredArgsConstructor
@@ -27,16 +24,21 @@ public class AuthService {
     @Value("${security.jwt.refresh.token-name}")
     private String jwtRefreshTokenName;
 
-    public void register(UserRequestDto userRequestDto) {
+    public UserResponseDto register(UserRequestDto userRequestDto) {
         User user = modelMapper.map(userRequestDto, User.class);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        auth(user);
+        return auth(user);
     }
 
-    public void login(UserRequestDto userRequestDto) {
+    public UserResponseDto login(UserRequestDto userRequestDto) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userRequestDto.getEmail(), userRequestDto.getPassword()));
         User user = (User) authentication.getPrincipal();
-        auth(user);
+        return auth(user);
+    }
+
+    private UserResponseDto auth(User user) {
+        user.setRefresh(jwtService.generateCookie(user));
+        return modelMapper.map(userRepository.save(user), UserResponseDto.class);
     }
 
     public void refresh(HttpServletRequest request) throws JwtException {
@@ -46,7 +48,8 @@ public class AuthService {
             if (username != null) {
                 User user = userService.loadUserByUsername(username);
                 if (jwtService.isTokenValid(refreshToken, user) && refreshToken.equals(user.getRefresh())) {
-                    auth(user);
+                    user.setRefresh(jwtService.generateCookie(user));
+                    userRepository.save(user);
                     return;
                 }
             }
@@ -56,10 +59,5 @@ public class AuthService {
 
     public void logout() {
         jwtService.eraseCookie();
-    }
-
-    private void auth(User user) {
-        user.setRefresh(jwtService.generateCookie(user));
-        userRepository.save(user);
     }
 }

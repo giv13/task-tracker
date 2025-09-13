@@ -21,17 +21,17 @@
         <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto">
           <li class="nav-item dropdown user-menu">
             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
-              <span class="d-none d-md-inline">Alexander Pierce</span>
+              <span class="user-name"></span>
             </a>
             <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
               <li class="user-header bg-primary">
                 <p>
-                  Alexander Pierce
-                  <small>test@mail.ru</small>
+                  <span class="user-name"></span>
+                  <small class="user-email"></small>
                 </p>
               </li>
               <li class="user-footer">
-                <a href="#" class="btn btn-default btn-flat float-right">Выйти</a>
+                <a href="#" class="btn btn-default btn-flat float-right logout">Выйти</a>
               </li>
             </ul>
           </li>
@@ -226,5 +226,28 @@
   <script src="plugins/jquery/jquery.min.js"></script>
   <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="js/adminlte.min.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    $(document).ready(function () {
+      if (user === null) {
+        window.location.href = "login.html";
+      } else {
+        $(".user-name").text(user.name);
+        $(".user-email").text(user.email);
+      }
+
+      $(".logout").click(function () {
+        post(api.logout()).then((r) => {
+          localStorage.removeItem("user");
+          window.location.href = "login.html";
+        });
+        return false;
+      });
+
+      get(api.tasks()).then((r) => {
+        console.log(r);
+      });
+    });
+  </script>
 </body>
 </html>
