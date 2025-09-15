@@ -1,0 +1,34 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-color-table
+      author: giv13
+      changes:
+        - createTable:
+            tableName: color
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: color
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: integer
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_color_user_id
+                    referencedTableName: user
+                    referencedColumnNames: id
+        - addUniqueConstraint:
+            tableName: color
+            columnNames: color, user_id
+            constraintName: uq_color_color_user_id
+      rollback:
+        - dropTable:
+            tableName: color

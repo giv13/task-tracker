@@ -7,6 +7,7 @@ const api = {
     login: () => `${apiBaseUrl}/auth/login`,
     logout: () => `${apiBaseUrl}/auth/logout`,
     refresh: () => `${apiBaseUrl}/auth/refresh`,
+    colors: () => `${apiBaseUrl}/colors`,
     tasks: () => `${apiBaseUrl}/tasks`,
 };
 
@@ -32,6 +33,22 @@ const post = (url, form) => {
     return request(url, "POST", form);
 };
 
+const put = (url, form) => {
+    return request(url, "PUT", form);
+};
+
+const del = (url) => {
+    return request(url, "DELETE");
+};
+
+const removeErrors = (form) => {
+    form
+        .find(".is-invalid")
+        .removeClass("is-invalid")
+        .next(".error")
+        .remove();
+}
+
 let isRefreshRequesting = false;
 let requestsToRefresh = [];
 const request = async (url, method, form) => {
@@ -44,6 +61,7 @@ const request = async (url, method, form) => {
     if (Object.keys(data).length > 0) {
         options.body = JSON.stringify(data);
     }
+    removeErrors($(form));
     return await fetch(url, options)
         .then((r) => r.json())
         .then((r) => {
@@ -51,11 +69,6 @@ const request = async (url, method, form) => {
             return r.data;
         })
         .catch((r) => {
-            $(form)
-                .find(".is-invalid")
-                .removeClass("is-invalid")
-                .next(".error")
-                .remove();
             const error = r.error;
             if (r.status === 401 && user !== null) {
                 if (!isRefreshRequesting) {

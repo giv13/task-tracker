@@ -1,7 +1,9 @@
 package ru.giv13.tasktracker.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -22,8 +24,12 @@ public class User implements UserDetails {
     private String email;
 
     @Column(length = 100, nullable = false)
+    @ToString.Exclude
+    @JsonIgnore
     private String password;
 
+    @ToString.Exclude
+    @JsonIgnore
     private String refresh;
 
     @Override

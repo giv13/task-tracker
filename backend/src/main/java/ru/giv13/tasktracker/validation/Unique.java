@@ -16,4 +16,5 @@ public @interface Unique {
     Class<? extends Payload>[] payload() default {};
     Class<? extends JpaRepository<?, ?>> repository();
     String field();
+    boolean userConstraint() default false;
 }

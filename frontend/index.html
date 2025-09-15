@@ -52,6 +52,10 @@
       </div>
       <section class="content pb-3">
         <div class="container-fluid h-100">
+          <div class="btn-group-vertical align-self-start">
+            <button data-toggle="modal" data-target="#colors" class="btn btn-default" title="Управление цветом"><i class="fas fa-palette"></i></button>
+            <button data-toggle="modal" data-target="#create-category" class="btn btn-default" title="Добавить категорию"><i class="fas fa-window-restore"></i></button>
+          </div>
           <div class="card card-row card-secondary">
             <div class="card-header">
               <h3 class="card-title">
@@ -223,12 +227,45 @@
     </footer>
   </div>
 
+  <div class="modal fade" id="colors">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Управление цветом</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Закрыть">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <label>Добавленные цвета</label>
+          <ul class="d-flex colors-blocks">
+            <li data-color="#6c757d" style="color: #6c757d" title="Добавить цвет"><i class="fas fa-plus-square"></i></li>
+          </ul>
+          <form action="#" method="post" id="colors-form" class="mt-3 colors-hidden">
+            <div class="form-group">
+              <label for="colors-color">Цвет</label>
+              <input type="color" name="color" id="colors-color" class="form-control">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+          <div>
+            <button type="submit" class="btn btn-danger colors-hidden" form="colors-form">Удалить</button>
+            <button type="submit" class="btn btn-success colors-hidden" form="colors-form">Сохранить</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="plugins/jquery/jquery.min.js"></script>
   <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="js/adminlte.min.js"></script>
   <script src="js/api.js"></script>
   <script>
     $(document).ready(function () {
+      // Перенаправление, если не залогинен
       if (user === null) {
         window.location.href = "login.html";
       } else {
@@ -236,6 +273,7 @@
         $(".user-email").text(user.email);
       }
 
+      // Выход из системы
       $(".logout").click(function () {
         post(api.logout()).then((r) => {
           localStorage.removeItem("user");
@@ -244,6 +282,80 @@
         return false;
       });
 
+      // Управление цветом
+      const hideColorsHidden = () => {
+        $(".colors-hidden").hide();
+      };
+      const drawColor = (color) => {
+        $(".colors-blocks li:last-child").before(
+          '<li data-id="' +
+          color.id +
+          '" data-color="' +
+          color.color +
+          '" style="color: ' +
+          color.color +
+          '" title="Изменить цвет"><i class="fas fa-square"></i></li>',
+        );
+      };
+      let isColorsFirstOpen = true;
+      $("#colors").on("show.bs.modal", function () {
+        hideColorsHidden();
+        if (isColorsFirstOpen) {
+          get(api.colors()).then((colors) => {
+            colors.forEach((color) => {
+              drawColor(color);
+            });
+            isColorsFirstOpen = false;
+          });
+        }
+      });
+      $(".colors-blocks").on("click", "li", function () {
+        const color = $(this),
+              isNew = !color.attr("data-id"),
+              modal = color.parents(".modal"),
+              form  = modal.find("form");
+        if (isNew) {
+          form.removeAttr("data-id");
+        } else {
+          form.attr("data-id", color.attr("data-id"));
+        }
+        form.find('[name="color"]').val(color.attr("data-color"));
+        removeErrors(form);
+        form.show();
+        modal.find(".btn-success").show();
+        modal.find(".btn-danger").toggle(!isNew);
+      });
+      $("#colors-form").submit(function (e) {
+        const submitter = $(e.originalEvent.submitter),
+              id        = $(this).attr("data-id");
+        let url = api.colors();
+        if (id) {
+          url += "/" + id;
+        }
+        if (submitter.hasClass("btn-danger")) {
+          del(url).then((color) => {
+            $('.colors-blocks li[data-id="' + color.id + '"]').remove();
+            hideColorsHidden();
+          });
+        } else {
+          if (id) {
+            put(url, this).then((color) => {
+              $('.colors-blocks li[data-id="' + color.id + '"]')
+                .attr("data-color", color.color)
+                .css("color", color.color);
+              hideColorsHidden();
+            });
+          } else {
+            post(url, this).then((color) => {
+              drawColor(color);
+              hideColorsHidden();
+            });
+          }
+        }
+        return false;
+      });
+
+      // Список задач
       get(api.tasks()).then((r) => {
         console.log(r);
       });

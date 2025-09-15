@@ -2,3 +2,14 @@
     height: auto;
     border-bottom: 10px solid transparent;
 }
+.colors-blocks {
+    padding: 0;
+    margin: -3px;
+    list-style: none;
+}
+.colors-blocks li {
+    margin: 3px;
+    font-size: 24px;
+    line-height: 0;
+    cursor: pointer;
+}

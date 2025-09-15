@@ -1,6 +1,7 @@
 package ru.giv13.tasktracker.system;
 
 import io.jsonwebtoken.JwtException;
+import org.hibernate.ObjectNotFoundException;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -41,6 +42,12 @@ public class GlobalExceptionHandler implements ResponseBodyAdvice<Object> {
     @ExceptionHandler(JwtException.class)
     private Response<String> onJwtException(Exception exception) {
         return Response.er(exception.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(ObjectNotFoundException.class)
+    public Response<String> onObjectNotFoundException(Exception exception) {
+        String[] message = exception.getMessage().split(": ");
+        return Response.er("Объект не найден: " + message[1], HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)

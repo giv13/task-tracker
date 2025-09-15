@@ -9,10 +9,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.servlet.HandlerMapping;
+import ru.giv13.tasktracker.user.User;
 
 import java.util.Map;
 
@@ -20,17 +22,25 @@ import java.util.Map;
 public class UniqueValidator implements ConstraintValidator<Unique, String> {
     private final ApplicationContext applicationContext;
     private JpaRepository<?, ?> repository;
+    private boolean userConstraint;
     private String spelExpression;
 
     @Override
     public void initialize(Unique constraintAnnotation) {
-        this.repository = applicationContext.getBean(constraintAnnotation.repository());
-        this.spelExpression = "#repository.existsBy" + StringUtils.capitalize(constraintAnnotation.field()) + "AndIdNot(#value, #id)";
+        repository = applicationContext.getBean(constraintAnnotation.repository());
+        userConstraint = constraintAnnotation.userConstraint();
+        spelExpression = "#repository.existsBy"
+                + StringUtils.capitalize(constraintAnnotation.field())
+                + "AndIdNot"
+                + (userConstraint ? "AndUserId" : "")
+                + "(#value, #id"
+                + (userConstraint ? ", #userId" : "")
+                + ")";
     }
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        if (value.isBlank()) {
+        if (value == null || value.isBlank()) {
             return true;
         }
         try {
@@ -38,6 +48,9 @@ public class UniqueValidator implements ConstraintValidator<Unique, String> {
             spelContext.setVariable("repository", repository);
             spelContext.setVariable("value", value);
             spelContext.setVariable("id", getIdFromRequest());
+            if (userConstraint) {
+                spelContext.setVariable("userId", ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId());
+            }
             Expression expression = new SpelExpressionParser().parseExpression(spelExpression);
             Object result = expression.getValue(spelContext);
             if (result instanceof Boolean) {
