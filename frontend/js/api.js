@@ -8,6 +8,7 @@ const api = {
     logout: () => `${apiBaseUrl}/auth/logout`,
     refresh: () => `${apiBaseUrl}/auth/refresh`,
     colors: () => `${apiBaseUrl}/colors`,
+    categories: () => `${apiBaseUrl}/categories`,
     tasks: () => `${apiBaseUrl}/tasks`,
 };
 
@@ -47,6 +48,10 @@ const removeErrors = (form) => {
         .removeClass("is-invalid")
         .next(".error")
         .remove();
+}
+
+const hideModal = () => {
+    $('.modal').modal('hide');
 }
 
 let isRefreshRequesting = false;

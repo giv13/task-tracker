@@ -19,7 +19,7 @@ import ru.giv13.tasktracker.user.User;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class UniqueValidator implements ConstraintValidator<Unique, String> {
+public class UniqueValidator implements ConstraintValidator<Unique, Object> {
     private final ApplicationContext applicationContext;
     private JpaRepository<?, ?> repository;
     private boolean userConstraint;
@@ -39,8 +39,8 @@ public class UniqueValidator implements ConstraintValidator<Unique, String> {
     }
 
     @Override
-    public boolean isValid(String value, ConstraintValidatorContext context) {
-        if (value == null || value.isBlank()) {
+    public boolean isValid(Object value, ConstraintValidatorContext context) {
+        if (value == null || (value instanceof String && ((String) value).isBlank())) {
             return true;
         }
         try {

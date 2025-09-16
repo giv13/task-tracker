@@ -14,10 +14,10 @@ public class ColorRequestDto {
 
     @NotBlank(groups = FirstGroup.class)
     @Pattern(regexp = "^#[A-Fa-f0-9]{6}$", message = "Должно быть HEX-кодом", groups = FirstGroup.class)
-    @Unique(repository=ColorRepository.class, field="color", userConstraint = true, groups = SecondGroup.class)
-    private String color;
+    @Unique(repository=ColorRepository.class, field="hex", userConstraint = true, groups = SecondGroup.class)
+    private String hex;
 
-    public void setColor(String color) {
-        this.color = color.toLowerCase();
+    public void setHex(String hex) {
+        this.hex = hex.toLowerCase();
     }
 }

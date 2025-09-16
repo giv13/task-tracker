@@ -1,0 +1,48 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-category-table
+      author: giv13
+      changes:
+        - createTable:
+            tableName: category
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: index
+                  type: integer
+                  defaultValueNumeric: "0"
+              - column:
+                  name: color_id
+                  type: integer
+              - column:
+                  name: user_id
+                  type: integer
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_category_user_id
+                    referencedTableName: user
+                    referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableName: category
+            baseColumnNames: color_id
+            referencedTableName: color
+            referencedColumnNames: id
+            constraintName: fk_category_color_id
+            onDelete: SET NULL
+        - addUniqueConstraint:
+            tableName: category
+            columnNames: name, user_id
+            constraintName: uq_category_name_user_id
+      rollback:
+        - dropTable:
+            tableName: category

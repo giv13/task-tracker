@@ -7,7 +7,7 @@ import ru.giv13.tasktracker.user.User;
 
 @Entity
 @Table(uniqueConstraints = {
-    @UniqueConstraint(name = "uq_color_color_user_id", columnNames = { "color", "user_id" })
+    @UniqueConstraint(name = "uq_color_hex_user_id", columnNames = { "hex", "user_id" })
 })
 @Data
 public class Color {
@@ -16,7 +16,7 @@ public class Color {
     private Integer id;
 
     @Column(length = 50, nullable = false)
-    private String color;
+    private String hex;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_color_user_id"))

@@ -13,7 +13,7 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
               - column:
-                  name: color
+                  name: hex
                   type: varchar(50)
                   constraints:
                     nullable: false
@@ -27,8 +27,8 @@ databaseChangeLog:
                     referencedColumnNames: id
         - addUniqueConstraint:
             tableName: color
-            columnNames: color, user_id
-            constraintName: uq_color_color_user_id
+            columnNames: hex, user_id
+            constraintName: uq_color_hex_user_id
       rollback:
         - dropTable:
             tableName: color

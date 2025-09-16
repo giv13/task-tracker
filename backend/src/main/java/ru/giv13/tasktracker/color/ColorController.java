@@ -28,7 +28,7 @@ public class ColorController {
     }
 
     @DeleteMapping("{id}")
-    public Color delete(@PathVariable("id") Integer id) {
-        return colorService.delete(id);
+    public void delete(@PathVariable("id") Integer id) {
+        colorService.delete(id);
     }
 }

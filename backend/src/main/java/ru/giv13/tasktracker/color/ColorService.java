@@ -35,9 +35,8 @@ public class ColorService {
         return colorRepository.save(color);
     }
 
-    public Color delete(Integer id) {
+    public void delete(Integer id) {
         Color color = colorRepository.findByIdAndUserId(id, principal.getId()).orElseThrow(() -> new ObjectNotFoundException(id, "Color"));
         colorRepository.deleteById(color.getId());
-        return color;
     }
 }
