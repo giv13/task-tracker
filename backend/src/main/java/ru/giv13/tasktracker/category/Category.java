@@ -1,6 +1,5 @@
 package ru.giv13.tasktracker.category;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.ColumnDefault;
@@ -32,6 +31,5 @@ public class Category {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_category_user_id"))
-    @JsonIgnore
     private User user;
 }

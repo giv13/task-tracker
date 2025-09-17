@@ -1,6 +1,5 @@
 package ru.giv13.tasktracker.color;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import ru.giv13.tasktracker.user.User;
@@ -20,6 +19,5 @@ public class Color {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_color_user_id"))
-    @JsonIgnore
     private User user;
 }

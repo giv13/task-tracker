@@ -13,17 +13,17 @@ public class ColorController {
     private final ColorService colorService;
 
     @GetMapping
-    public List<Color> getAll() {
+    public List<ColorResponseDto> getAll() {
         return colorService.getAll();
     }
 
     @PostMapping
-    public Color create(@Valid @RequestBody ColorRequestDto colorRequestDto) {
+    public ColorResponseDto create(@Valid @RequestBody ColorRequestDto colorRequestDto) {
         return colorService.create(colorRequestDto);
     }
 
     @PutMapping("{id}")
-    public Color update(@PathVariable("id") Integer id, @Valid @RequestBody ColorRequestDto colorRequestDto) {
+    public ColorResponseDto update(@PathVariable("id") Integer id, @Valid @RequestBody ColorRequestDto colorRequestDto) {
         return colorService.update(id, colorRequestDto);
     }
 

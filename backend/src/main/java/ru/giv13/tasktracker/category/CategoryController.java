@@ -13,17 +13,17 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping
-    public List<Category> getAll() {
+    public List<CategoryResponseDto> getAll() {
         return categoryService.getAll();
     }
 
     @PostMapping
-    public Category create(@Valid @RequestBody CategoryRequestDto categoryRequestDto) {
+    public CategoryResponseDto create(@Valid @RequestBody CategoryRequestDto categoryRequestDto) {
         return categoryService.create(categoryRequestDto);
     }
 
     @PutMapping("{id}")
-    public Category update(@PathVariable("id") Integer id, @Valid @RequestBody CategoryRequestDto categoryRequestDto) {
+    public CategoryResponseDto update(@PathVariable("id") Integer id, @Valid @RequestBody CategoryRequestDto categoryRequestDto) {
         return categoryService.update(id, categoryRequestDto);
     }
 
