@@ -27,6 +27,11 @@ public class CategoryController {
         return categoryService.update(id, categoryRequestDto);
     }
 
+    @PatchMapping("{id}")
+    public void updateOrder(@PathVariable("id") Integer id, @Valid @RequestBody OffsetDto offsetDto) {
+        categoryService.updateOrder(id, offsetDto);
+    }
+
     @DeleteMapping("{id}")
     public void delete(@PathVariable("id") Integer id) {
         categoryService.delete(id);

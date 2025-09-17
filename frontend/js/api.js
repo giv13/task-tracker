@@ -38,6 +38,10 @@ const put = (url, form) => {
     return request(url, "PUT", form);
 };
 
+const patch = (url, form) => {
+    return request(url, "PATCH", form);
+};
+
 const del = (url) => {
     return request(url, "DELETE");
 };

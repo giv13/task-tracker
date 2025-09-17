@@ -223,6 +223,7 @@
 
   <script src="plugins/jquery/jquery.min.js"></script>
   <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="plugins/jquery-ui/jquery-ui.min.js"></script>
   <script src="js/adminlte.min.js"></script>
   <script src="js/api.js"></script>
   <script>
@@ -248,17 +249,17 @@
       let colors;
       const getColors = async () => {
         if (colors === undefined) {
+          colors = new Map();
           await get(api.colors()).then((c) => {
-            colors = c.reduce((acc, color) => {
-              acc[color.id] = color;
-              return acc;
-            }, {});
+            Object.values(c).forEach((color) => {
+              colors.set(color.id, color);
+            });
           });
         }
       };
       const drawColors = () => {
         $(".colors-colors [data-id]").remove();
-        Object.values(colors).forEach((color) => {
+        colors.forEach((color) => {
           $(".colors-colors li:last-child").before(
                   '<li data-id="' +
                   color.id +
@@ -281,10 +282,10 @@
       });
       $(".colors-colors").on("click", "li", function () {
         const color = $(this),
-                id = color.attr("data-id"),
+                id = parseInt(color.attr("data-id")),
                 modal = color.parents(".modal"),
                 form = modal.find("form");
-        if (id) {
+        if (id > 0) {
           form.attr("data-id", id);
         } else {
           form.removeAttr("data-id");
@@ -293,32 +294,40 @@
         removeErrors(form);
         form.show();
         modal.find(".btn-success").show();
-        modal.find(".btn-danger").toggle(!!id);
+        modal.find(".btn-danger").toggle(id > 0);
       });
       $("#colors-form").submit(function (e) {
         const submitter = $(e.originalEvent.submitter),
-                id = $(this).attr("data-id");
+                id = parseInt($(this).attr("data-id"));
         let url = api.colors();
-        if (id) {
+        if (id > 0) {
           url += "/" + id;
         }
         if (submitter.hasClass("btn-danger")) {
           del(url).then(() => {
-            delete colors[id];
+            colors.delete(id);
             drawColors();
             hideColorsHidden();
-            Object.values(categories).forEach((category) => {
-              if (category.color?.id === parseInt(id)) {
-                categories[category.id].color = null;
+            categories.forEach((category) => {
+              if (category.color?.id === id) {
+                category.color = null;
               }
             });
             drawCategories();
           });
         } else {
-          (id ? put : post)(url, this).then((color) => {
-            colors[color.id] = color;
+          (id > 0 ? put : post)(url, this).then((color) => {
+            colors.set(color.id, color);
             drawColors();
             hideColorsHidden();
+            if (id > 0) {
+              categories.forEach((category) => {
+                if (category.color?.id === id) {
+                  category.color.hex = color.hex;
+                }
+              });
+              drawCategories();
+            }
           });
         }
         return false;
@@ -338,16 +347,20 @@
 
       // Управление категориями
       let categories;
-      get(api.categories()).then((c) => {
-        categories = c.reduce((acc, category) => {
-          acc[category.id] = category;
-          return acc;
-        }, {});
+      const getCategories = async () => {
+        categories = new Map();
+        await get(api.categories()).then((c) => {
+          Object.values(c).forEach((category) => {
+            categories.set(category.id, category);
+          });
+        });
+      };
+      getCategories().then(() => {
         drawCategories();
       });
       const drawCategories = () => {
         $(".card-category").remove();
-        Object.values(categories).forEach((category) => {
+        categories.forEach((category) => {
           const bgColor = category.color?.hex ?? "#6c757d";
           $(".card-secondary").before(
                   '<div class="card card-row card-category" data-id="' +
@@ -366,7 +379,7 @@
         $(".categories-colors").html(
                 '<li style="color: #6c757d" title="Выбрать цвет"><label><input type="radio" name="color" value="null" checked><i class="fas fa-square"></i></label></li>',
         );
-        Object.values(colors).forEach((color) => {
+        colors.forEach((color) => {
           $(".categories-colors").append(
                   '<li style="color: ' +
                   color.hex +
@@ -379,14 +392,14 @@
       $("#categories").on("show.bs.modal", function (e) {
         getColors().then(() => {
           drawCategoriesColors();
-          const id = $(e.relatedTarget).parents(".card").attr("data-id"),
+          const id = parseInt($(e.relatedTarget).parents(".card").attr("data-id")),
                   modal = $(this),
                   form = modal.find("form");
           form[0].reset();
-          if (id) {
+          if (id > 0) {
             form.attr("data-id", id);
             modal.find(".btn-danger").show();
-            Object.entries(categories[id]).forEach(([key, value]) => {
+            Object.entries(categories.get(id)).forEach(([key, value]) => {
               const input = form.find('[name="' + key + '"]'),
                       val = value?.id ?? value;
               if (input.attr("type") === "radio") {
@@ -403,25 +416,44 @@
       });
       $("#categories-form").submit(function (e) {
         const submitter = $(e.originalEvent.submitter),
-                id = $(this).attr("data-id");
+                id = parseInt($(this).attr("data-id"));
         let url = api.categories();
-        if (id) {
+        if (id > 0) {
           url += "/" + id;
         }
         if (submitter.hasClass("btn-danger")) {
           del(url).then(() => {
-            delete categories[id];
+            categories.delete(id);
             drawCategories();
             hideModal();
           });
         } else {
-          (id ? put : post)(url, this).then((category) => {
-            categories[category.id] = category;
+          (id > 0 ? put : post)(url, this).then((category) => {
+            categories.set(category.id, category);
             drawCategories();
             hideModal();
           });
         }
         return false;
+      });
+
+      // Порядок категорий
+      let cardIndex;
+      $(".cards").sortable({
+        items: ".card-category",
+        cursor: "move",
+        start: function (element, ui) {
+          cardIndex = ui.item.index();
+        },
+        update: function (event, ui) {
+          const offset = ui.item.index() - cardIndex,
+                  form = $("<form></form>").prepend(
+                          '<input type="text" name="offset" value="' + offset + '">',
+                  )[0];
+          patch(api.categories() + "/" + ui.item.attr("data-id"), form).then(() => {
+            getCategories();
+          });
+        },
       });
 
       // Список задач
