@@ -5,3 +5,5 @@ databaseChangeLog:
       file: db/changelog/1.x/create-color-table.yaml
   - include:
       file: db/changelog/1.x/create-category-table.yaml
+  - include:
+      file: db/changelog/1.x/create-task-table.yaml

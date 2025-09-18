@@ -1,0 +1,65 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-task-table
+      author: giv13
+      changes:
+        - createTable:
+            tableName: task
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: notes
+                  type: text
+              - column:
+                  name: index
+                  type: integer
+                  defaultValueNumeric: "0"
+              - column:
+                  name: is_done
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: color_id
+                  type: integer
+              - column:
+                  name: category_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: integer
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_task_user_id
+                    referencedTableName: user
+                    referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableName: task
+            baseColumnNames: color_id
+            referencedTableName: color
+            referencedColumnNames: id
+            constraintName: fk_task_color_id
+            onDelete: SET NULL
+        - addForeignKeyConstraint:
+            baseTableName: task
+            baseColumnNames: category_id
+            referencedTableName: category
+            referencedColumnNames: id
+            constraintName: fk_task_category_id
+            onDelete: RESTRICT
+      rollback:
+        - dropTable:
+            tableName: task

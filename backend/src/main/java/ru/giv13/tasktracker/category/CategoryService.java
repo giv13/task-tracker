@@ -20,8 +20,8 @@ public class CategoryService implements PrincipalProvider {
     private final ModelMapper mapper;
 
     @Transactional(readOnly = true)
-    public List<CategoryResponseDto> getAll() {
-        return categoryRepository.findAllByUserId(getPrincipalId(), Sort.by("index")).stream().map(category -> mapper.map(category, CategoryResponseDto.class)).toList();
+    public List<CategoryWithTasksResponseDto> getAll() {
+        return categoryRepository.findAllByUserId(getPrincipalId(), Sort.by("index")).stream().map(category -> mapper.map(category, CategoryWithTasksResponseDto.class)).toList();
     }
 
     @Transactional

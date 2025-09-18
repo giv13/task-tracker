@@ -10,7 +10,7 @@ import ru.giv13.tasktracker.security.UserAwareRepository;
 import java.util.List;
 
 public interface CategoryRepository extends UserAwareRepository<Category, Integer> {
-    @EntityGraph(attributePaths = "color")
+    @EntityGraph(attributePaths = { "color", "tasks.color" })
     List<Category> findAllByUserId(Integer userId, Sort sort);
 
     @Query("SELECT COALESCE(MAX(c.index) + 1, 0) FROM Category c WHERE c.user.id = :userId")

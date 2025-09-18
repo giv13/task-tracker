@@ -13,7 +13,7 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping
-    public List<CategoryResponseDto> getAll() {
+    public List<CategoryWithTasksResponseDto> getAll() {
         return categoryService.getAll();
     }
 

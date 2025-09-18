@@ -1,16 +1,27 @@
 package ru.giv13.tasktracker.task;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("tasks")
+@RequiredArgsConstructor
 public class TaskController {
-    @GetMapping
-    public Map<String, String> getAll() {
-        return Map.of("test", "test");
+    private final TaskService taskService;
+
+    @PostMapping
+    public TaskResponseDto create(@Valid @RequestBody TaskRequestDto taskRequestDto) {
+        return taskService.create(taskRequestDto);
+    }
+
+    @PutMapping("{id}")
+    public TaskResponseDto update(@PathVariable("id") Integer id, @Valid @RequestBody TaskRequestDto taskRequestDto) {
+        return taskService.update(id, taskRequestDto);
+    }
+
+    @DeleteMapping("{id}")
+    public void delete(@PathVariable("id") Integer id) {
+        taskService.delete(id);
     }
 }

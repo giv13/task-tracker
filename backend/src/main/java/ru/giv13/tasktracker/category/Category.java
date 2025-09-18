@@ -6,7 +6,10 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import ru.giv13.tasktracker.color.Color;
+import ru.giv13.tasktracker.task.Task;
 import ru.giv13.tasktracker.user.User;
+
+import java.util.List;
 
 @Entity
 @Table(uniqueConstraints = {
@@ -32,4 +35,7 @@ public class Category {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_category_user_id"))
     private User user;
+
+    @OneToMany(mappedBy = "category")
+    private List<Task> tasks;
 }
