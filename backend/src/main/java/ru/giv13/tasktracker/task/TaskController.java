@@ -20,6 +20,11 @@ public class TaskController {
         return taskService.update(id, taskRequestDto);
     }
 
+    @PatchMapping("{id}")
+    public void sort(@PathVariable("id") Integer id, @Valid @RequestBody TaskSortDto taskSortDto) {
+        taskService.sort(id, taskSortDto);
+    }
+
     @DeleteMapping("{id}")
     public void delete(@PathVariable("id") Integer id) {
         taskService.delete(id);

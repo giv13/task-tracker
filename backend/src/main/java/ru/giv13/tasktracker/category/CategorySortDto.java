@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class OffsetDto {
+public class CategorySortDto {
     @NotNull
     private Integer offset;
 }

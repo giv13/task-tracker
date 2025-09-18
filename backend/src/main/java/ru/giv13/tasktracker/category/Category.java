@@ -2,6 +2,7 @@ package ru.giv13.tasktracker.category;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -37,5 +38,6 @@ public class Category {
     private User user;
 
     @OneToMany(mappedBy = "category")
+    @ToString.Exclude
     private List<Task> tasks;
 }

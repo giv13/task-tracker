@@ -28,8 +28,8 @@ public class CategoryController {
     }
 
     @PatchMapping("{id}")
-    public void updateOrder(@PathVariable("id") Integer id, @Valid @RequestBody OffsetDto offsetDto) {
-        categoryService.updateOrder(id, offsetDto);
+    public void sort(@PathVariable("id") Integer id, @Valid @RequestBody CategorySortDto categorySortDto) {
+        categoryService.sort(id, categorySortDto);
     }
 
     @DeleteMapping("{id}")

@@ -22,7 +22,7 @@ public class TaskService implements PrincipalProvider {
     public TaskResponseDto create(TaskRequestDto taskRequestDto) {
         Category category = categoryRepository.findByIdAndUserId(taskRequestDto.getCategory(), getPrincipalId()).orElseThrow(() -> new ObjectNotFoundException(taskRequestDto.getCategory(), "Category"));
         Task task = mapper.map(taskRequestDto, Task.class);
-        task.setIndex(taskRepository.getNextIndexByUserId(getPrincipalId()));
+        task.setIndex(taskRepository.getNextIndexByCategoryId(category.getId()));
         task.setColor(taskRequestDto.getColor() == null ? null : colorRepository.findByIdAndUserId(taskRequestDto.getColor(), getPrincipalId()).orElse(null));
         task.setCategory(category);
         task.setUser(getPrincipal());
@@ -38,6 +38,33 @@ public class TaskService implements PrincipalProvider {
         task.setCategory(category);
         taskRepository.save(task);
         return mapper.map(task, TaskResponseDto.class);
+    }
+
+    @Transactional
+    public void sort(Integer id, TaskSortDto taskSortDto) {
+        Task task = taskRepository.findByIdAndUserId(id, getPrincipalId()).orElseThrow(() -> new ObjectNotFoundException(id, "Task"));
+        if (taskSortDto.getCategory() != null && !taskSortDto.getCategory().equals(task.getCategory().getId())) {
+            Category category = categoryRepository.findByIdAndUserId(taskSortDto.getCategory(), getPrincipalId()).orElseThrow(() -> new ObjectNotFoundException(taskSortDto.getCategory(), "Category"));
+            Integer offsetIndex = taskRepository.getMaxOffsetIndex(task.getIndex(), Integer.MAX_VALUE, task.getCategory().getId());
+            taskRepository.changeIndexes(-1, task.getIndex(), offsetIndex, task.getCategory().getId());
+            task.setIndex(taskRepository.getNextIndexByCategoryId(category.getId()));
+            task.setCategory(category);
+            taskRepository.save(task);
+        }
+        if (taskSortDto.getOffset() != 0) {
+            Integer offsetIndex = taskSortDto.getOffset() > 0
+                    ? taskRepository.getMaxOffsetIndex(task.getIndex(), taskSortDto.getOffset(), task.getCategory().getId())
+                    : taskRepository.getMinOffsetIndex(task.getIndex(), -taskSortDto.getOffset(), task.getCategory().getId());
+            if (offsetIndex != null) {
+                if (taskSortDto.getOffset() > 0) {
+                    taskRepository.changeIndexes(-1, task.getIndex(), offsetIndex, task.getCategory().getId());
+                } else {
+                    taskRepository.changeIndexes(1, offsetIndex, task.getIndex(), task.getCategory().getId());
+                }
+                task.setIndex(offsetIndex);
+                taskRepository.save(task);
+            }
+        }
     }
 
     @Transactional

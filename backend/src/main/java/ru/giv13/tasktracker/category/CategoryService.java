@@ -3,7 +3,6 @@ package ru.giv13.tasktracker.category;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.ObjectNotFoundException;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.giv13.tasktracker.color.ColorRepository;
@@ -21,7 +20,7 @@ public class CategoryService implements PrincipalProvider {
 
     @Transactional(readOnly = true)
     public List<CategoryWithTasksResponseDto> getAll() {
-        return categoryRepository.findAllByUserId(getPrincipalId(), Sort.by("index")).stream().map(category -> mapper.map(category, CategoryWithTasksResponseDto.class)).toList();
+        return categoryRepository.findAllByUserId(getPrincipalId()).stream().map(category -> mapper.map(category, CategoryWithTasksResponseDto.class)).toList();
     }
 
     @Transactional
@@ -43,8 +42,8 @@ public class CategoryService implements PrincipalProvider {
     }
 
     @Transactional
-    public void updateOrder(Integer id, OffsetDto offsetDto) {
-        Integer offset = offsetDto.getOffset();
+    public void sort(Integer id, CategorySortDto categorySortDto) {
+        Integer offset = categorySortDto.getOffset();
         if (offset == 0) return;
         Optional<Category> optCategory = categoryRepository.findByIdAndUserId(id, getPrincipalId());
         if (optCategory.isPresent()) {
