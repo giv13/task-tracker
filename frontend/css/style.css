@@ -25,6 +25,10 @@
 .card-category .card-tools a {
     color: inherit;
 }
-.card-success {
+.card-success .card-task {
     opacity: 0.5;
+    text-decoration: line-through;
+}
+.card-success .card-task .card-title {
+    text-decoration: line-through;
 }

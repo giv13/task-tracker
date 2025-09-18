@@ -157,6 +157,10 @@
               <textarea name="notes" id="tasks-notes" class="summernote"></textarea>
             </div>
             <div class="form-group">
+              <label for="tasks-category">Категория</label>
+              <select name="category" id="tasks-category" class="custom-select"></select>
+            </div>
+            <div class="form-group">
               <label>Цвет</label>
               <ul class="d-flex categories-colors"></ul>
             </div>
@@ -166,7 +170,6 @@
                 <label class="custom-control-label" for="tasks-done">Задача выполнена</label>
               </div>
             </div>
-            <input type="hidden" name="category">
           </form>
         </div>
         <div class="modal-footer justify-content-between">
@@ -320,39 +323,6 @@
       };
       getCategories().then(() => {
         drawCategories();
-
-        // Сортировка задач
-        let taskIndex;
-        $(".tasks").sortable({
-          connectWith: ".tasks",
-          items: ".card-task",
-          cancel: ".card-task .card-body",
-          cursor: "move",
-          start: function (element, ui) {
-            taskIndex = ui.item.index();
-          },
-          update: function (event, ui) {
-            if (this === ui.item.parent()[0]) {
-              const category = ui.item.parents(".card-category").attr("data-id"),
-                      change = ui.item.attr("data-category") !== category,
-                      offset = change
-                              ? ui.item.index() - ui.item.parent().find(".card-task").length + 1
-                              : ui.item.index() - taskIndex,
-                      form = $("<form></form>").prepend(
-                              '<input type="text" name="offset" value="' + offset + '">',
-                      );
-              if (change) {
-                form.prepend('<input type="text" name="category" value="' + category + '">');
-              }
-              patch(api.tasks() + "/" + ui.item.attr("data-id"), form[0]).then(() => {
-                if (change) {
-                  ui.item.attr("data-category", category);
-                }
-                getCategories();
-              });
-            }
-          },
-        });
       });
       const truncateText = (text, maxLength) => {
         text = text?.replace(/<[^>]+>/g, "") ?? "";
@@ -427,6 +397,44 @@
                           }, ""),
                   );
         });
+
+        // Сортировка задач
+        $(".tasks").sortable({
+          connectWith: ".tasks",
+          items: ".card-task",
+          cancel: ".card-task .card-body",
+          cursor: "move",
+          start: function (element, ui) {
+            ui.item.data("index", ui.item.index());
+            ui.item.data("category", parseInt(ui.item.parents(".card-category").attr("data-id") ?? 0));
+          },
+          stop: function (element, ui) {
+            const index = ui.item.index(),
+                    category = parseInt(ui.item.parents(".card-category").attr("data-id") ?? 0),
+                    isCategoryChanged = category !== ui.item.data("category");
+            if (category === 0 && !isCategoryChanged) {
+              $(element.target).sortable("cancel");
+              return;
+            }
+            if (index !== ui.item.data("index") || isCategoryChanged) {
+              const offset = isCategoryChanged
+                              ? index - ui.item.siblings(".card-task").length
+                              : index - ui.item.data("index"),
+                      form = $("<form></form>").prepend(
+                              '<input type="text" name="offset" value="' + offset + '">',
+                      );
+              if (isCategoryChanged) {
+                form.prepend('<input type="text" name="category" value="' + category + '">');
+              }
+              patch(api.tasks() + "/" + ui.item.attr("data-id"), form[0]).then(() => {
+                if (isCategoryChanged) {
+                  ui.item.attr("data-category", category);
+                }
+                getCategories();
+              });
+            }
+          },
+        });
       };
       const drawCategoriesColors = () => {
         $(".categories-colors").html(
@@ -448,6 +456,8 @@
                   val = value?.id ?? value;
           if (input.attr("type") === "radio" || input.attr("type") === "checkbox") {
             input.filter('[value="' + val + '"]').prop("checked", true);
+          } else if (input.is("select")) {
+            input.find('[value="' + val + '"]').prop("selected", true);
           } else if (input.hasClass("summernote")) {
             input.summernote("code", val);
           } else {
@@ -497,16 +507,15 @@
       });
 
       // Сортировка категорий
-      let categoryIndex;
       $(".categories").sortable({
         items: ".card-category",
         cancel: ".card-category .card-body",
         cursor: "move",
         start: function (element, ui) {
-          categoryIndex = ui.item.index();
+          ui.item.data("index", ui.item.index());
         },
         update: function (event, ui) {
-          const offset = ui.item.index() - categoryIndex,
+          const offset = ui.item.index() - ui.item.data("index"),
                   form = $("<form></form>").prepend(
                           '<input type="text" name="offset" value="' + offset + '">',
                   )[0];
@@ -517,11 +526,20 @@
       });
 
       // Управление задачами
+      const drawTasksCategory = () => {
+        $("#tasks-category").html(
+                categories.values().reduce((acc, category) => {
+                  acc += '<option value="' + category.id + '">' + category.name + "</option>";
+                  return acc;
+                }, ""),
+        );
+      };
       $(".summernote").summernote({
         height: 150,
       });
       $("#tasks").on("show.bs.modal", function (e) {
         getColors().then(() => {
+          drawTasksCategory();
           drawCategoriesColors();
           const id = parseInt($(e.relatedTarget).parents(".card-task").attr("data-id")),
                   category = parseInt($(e.relatedTarget).parents(".card-task").attr("data-category")),
@@ -560,6 +578,9 @@
         } else {
           (id > 0 ? put : post)(url, this).then((task) => {
             categories.get(task.category).tasks.set(task.id, task);
+            if (task.category !== category) {
+              categories.get(category).tasks.delete(task.id);
+            }
             drawCategories();
             hideModal();
           });

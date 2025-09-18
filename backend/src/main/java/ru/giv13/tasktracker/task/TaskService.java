@@ -31,11 +31,12 @@ public class TaskService implements PrincipalProvider {
 
     @Transactional
     public TaskResponseDto update(Integer id, TaskRequestDto taskRequestDto) {
-        Category category = categoryRepository.findByIdAndUserId(taskRequestDto.getCategory(), getPrincipalId()).orElseThrow(() -> new ObjectNotFoundException(taskRequestDto.getCategory(), "Category"));
         Task task = taskRepository.findByIdAndUserId(id, getPrincipalId()).orElseThrow(() -> new ObjectNotFoundException(id, "Task"));
         mapper.map(taskRequestDto, task);
         task.setColor(taskRequestDto.getColor() == null ? null : colorRepository.findByIdAndUserId(taskRequestDto.getColor(), getPrincipalId()).orElse(null));
-        task.setCategory(category);
+        if (!taskRequestDto.getCategory().equals(task.getCategory().getId())) {
+            updateCategory(task, taskRequestDto.getCategory());
+        }
         taskRepository.save(task);
         return mapper.map(task, TaskResponseDto.class);
     }
@@ -43,12 +44,14 @@ public class TaskService implements PrincipalProvider {
     @Transactional
     public void sort(Integer id, TaskSortDto taskSortDto) {
         Task task = taskRepository.findByIdAndUserId(id, getPrincipalId()).orElseThrow(() -> new ObjectNotFoundException(id, "Task"));
-        if (taskSortDto.getCategory() != null && !taskSortDto.getCategory().equals(task.getCategory().getId())) {
-            Category category = categoryRepository.findByIdAndUserId(taskSortDto.getCategory(), getPrincipalId()).orElseThrow(() -> new ObjectNotFoundException(taskSortDto.getCategory(), "Category"));
-            Integer offsetIndex = taskRepository.getMaxOffsetIndex(task.getIndex(), Integer.MAX_VALUE, task.getCategory().getId());
-            taskRepository.changeIndexes(-1, task.getIndex(), offsetIndex, task.getCategory().getId());
-            task.setIndex(taskRepository.getNextIndexByCategoryId(category.getId()));
-            task.setCategory(category);
+        if (taskSortDto.getCategory() != null) {
+            if (taskSortDto.getCategory() == 0) {
+                task.setDone(true);
+                taskRepository.save(task);
+                return;
+            }
+            task.setDone(false);
+            updateCategory(task, taskSortDto.getCategory());
             taskRepository.save(task);
         }
         if (taskSortDto.getOffset() != 0) {
@@ -71,5 +74,13 @@ public class TaskService implements PrincipalProvider {
     public void delete(Integer id) {
         Task task = taskRepository.findByIdAndUserId(id, getPrincipalId()).orElseThrow(() -> new ObjectNotFoundException(id, "Task"));
         taskRepository.deleteById(task.getId());
+    }
+
+    private void updateCategory(Task task, Integer categoryId) {
+        Category category = categoryRepository.findByIdAndUserId(categoryId, getPrincipalId()).orElseThrow(() -> new ObjectNotFoundException(categoryId, "Category"));
+        Integer offsetIndex = taskRepository.getMaxOffsetIndex(task.getIndex(), Integer.MAX_VALUE, task.getCategory().getId());
+        taskRepository.changeIndexes(-1, task.getIndex(), offsetIndex, task.getCategory().getId());
+        task.setIndex(taskRepository.getNextIndexByCategoryId(category.getId()));
+        task.setCategory(category);
     }
 }
