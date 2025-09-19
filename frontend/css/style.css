@@ -2,6 +2,13 @@
     height: auto;
     border-bottom: 10px solid transparent;
 }
+.categories .btn-group-vertical {
+    position: fixed;
+    z-index: 999;
+}
+.categories .btn-group-vertical + .card-category {
+    margin-left: 57px !important;
+}
 .colors-colors, .categories-colors {
     padding: 0;
     margin: -3px;
@@ -19,11 +26,19 @@
 .categories-colors input:checked + i:before {
     content: "\f14a";
 }
+.card-category .card-header {
+    display: block;
+    outline: none;
+}
 .card-category .card-tools {
     line-height: normal;
 }
 .card-category .card-tools a {
     color: inherit;
+}
+.card-task {
+    outline: none;
+    color: inherit !important;
 }
 .card-success .card-task {
     opacity: 0.5;

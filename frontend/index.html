@@ -58,7 +58,7 @@
             <button data-toggle="modal" data-target="#colors" class="btn btn-default" title="Управление цветом"><i class="fas fa-palette"></i></button>
             <button data-toggle="modal" data-target="#categories" class="btn btn-default" title="Добавить категорию"><i class="fas fa-plus"></i></button>
           </div>
-          <div class="card card-row card-success">
+          <div class="card card-row card-success card-category">
             <div class="card-header">
               <h3 class="card-title">Выполненные</h3>
             </div>
@@ -245,14 +245,10 @@
       });
       $(".colors-colors").on("click", "li", function () {
         const color = $(this),
-                id = parseInt(color.attr("data-id")),
+                id = parseInt(color.attr("data-id") ?? 0),
                 modal = color.parents(".modal"),
                 form = modal.find("form");
-        if (id > 0) {
-          form.attr("data-id", id);
-        } else {
-          form.removeAttr("data-id");
-        }
+        form.data("id", id);
         form.find('[name="hex"]').val(color.attr("data-hex"));
         removeErrors(form);
         form.show();
@@ -261,7 +257,7 @@
       });
       $("#colors-form").submit(function (e) {
         const submitter = $(e.originalEvent.submitter),
-                id = parseInt($(this).attr("data-id"));
+                id = $(this).data("id");
         let url = api.colors();
         if (id > 0) {
           url += "/" + id;
@@ -333,19 +329,15 @@
       };
       const drawTask = (task) => {
         return (
-                '<div class="card card-secondary card-outline card-task" data-id="' +
+                '<a href="#" data-toggle="modal" data-target="#tasks" title="Редактировать задачу" class="card card-secondary card-outline card-task" data-id="' +
                 task.id +
-                '"  data-category="' +
-                task.category +
                 '" style="border-top-color: ' +
                 (task.color?.hex ?? "#6c757d") +
                 '"><div class="card-header"><h5 class="card-title">' +
                 task.name +
-                '</h5><div class="card-tools">' +
-                '<a href="#" data-toggle="modal" data-target="#tasks" title="Редактировать задачу" class="btn btn-tool"><i class="fas fa-pen"></i></a>' +
-                '</div></div><div class="card-body">' +
+                '</h5></div><div class="card-body">' +
                 truncateText(task.notes, 180) +
-                "</div></div>"
+                "</div></a>"
         );
       };
       const getLuminance = (hexColor) => {
@@ -359,7 +351,7 @@
         return getLuminance(hexColor) > 0.5 ? "#000000" : "#ffffff";
       };
       const drawCategories = () => {
-        $(".card-category").remove();
+        $(".card-category:not(.card-success)").remove();
         const done = new Map();
         categories.forEach((category) => {
           const bgColor = category.color?.hex ?? "#6c757d";
@@ -367,18 +359,13 @@
                   .before(
                           '<div class="card card-row card-category" data-id="' +
                           category.id +
-                          '"><div class="card-header" style="background-color: ' +
+                          '"><a href="#" data-toggle="modal" data-target="#categories" title="Редактировать категорию" class="card-header" style="background-color: ' +
                           bgColor +
                           "; color: " +
                           getTextColorForBg(bgColor) +
                           '"><h3 class="card-title">' +
                           category.name +
-                          '</h3><div class="card-tools card-task" data-category="' +
-                          category.id +
-                          '">' +
-                          '<a href="#" data-toggle="modal" data-target="#tasks" title="Добавить задачу" class="btn btn-tool"><i class="fas fa-plus"></i></a>' +
-                          '<a href="#" data-toggle="modal" data-target="#categories" title="Редактировать категорию" class="btn btn-tool"><i class="fas fa-pen"></i></a>' +
-                          '</div></div><div class="card-body tasks">' +
+                          '</h3></a><div class="card-body tasks">' +
                           category.tasks.values().reduce((acc, task) => {
                             if (task.done) {
                               done.set(task.id, task);
@@ -387,7 +374,7 @@
                             }
                             return acc;
                           }, "") +
-                          "</div></div>",
+                          '<div class="text-center"><button data-toggle="modal" data-target="#tasks" class="btn btn-outline-dark btn-sm"><i class="fas fa-plus"></i> Добавить задачу</button></div></div></div>',
                   )
                   .find(".card-body")
                   .html(
@@ -402,7 +389,6 @@
         $(".tasks").sortable({
           connectWith: ".tasks",
           items: ".card-task",
-          cancel: ".card-task .card-body",
           cursor: "move",
           start: function (element, ui) {
             ui.item.data("index", ui.item.index());
@@ -427,12 +413,10 @@
                 form.prepend('<input type="text" name="category" value="' + category + '">');
               }
               patch(api.tasks() + "/" + ui.item.attr("data-id"), form[0]).then(() => {
-                if (isCategoryChanged) {
-                  ui.item.attr("data-category", category);
-                }
                 getCategories();
               });
             }
+            ui.item.parents(".card-body").find(".btn").parent().appendTo(ui.item.parents(".card-body"));
           },
         });
       };
@@ -468,23 +452,23 @@
       $("#categories").on("show.bs.modal", function (e) {
         getColors().then(() => {
           drawCategoriesColors();
-          const id = parseInt($(e.relatedTarget).parents(".card-category").attr("data-id")),
+          const id = parseInt($(e.relatedTarget).parents(".card-category").attr("data-id") ?? 0),
                   modal = $(this),
                   form = modal.find("form");
+          removeErrors(form);
           form[0].reset();
+          form.data("id", id);
           if (id > 0) {
-            form.attr("data-id", id);
             modal.find(".btn-danger").toggle(categories.get(id).tasks.size === 0);
             fillFields(categories.get(id), form);
           } else {
-            form.removeAttr("data-id");
             modal.find(".btn-danger").hide();
           }
         });
       });
       $("#categories-form").submit(function (e) {
         const submitter = $(e.originalEvent.submitter),
-                id = parseInt($(this).attr("data-id"));
+                id = $(this).data("id");
         let url = api.categories();
         if (id > 0) {
           url += "/" + id;
@@ -497,7 +481,9 @@
           });
         } else {
           (id > 0 ? put : post)(url, this).then((category) => {
-            category.tasks = categories.get(category.id).tasks;
+            category.tasks = categories.has(category.id)
+                    ? categories.get(category.id).tasks
+                    : new Map();
             categories.set(category.id, category);
             drawCategories();
             hideModal();
@@ -509,7 +495,7 @@
       // Сортировка категорий
       $(".categories").sortable({
         items: ".card-category",
-        cancel: ".card-category .card-body",
+        cancel: ".card-success, .card-category .card-body",
         cursor: "move",
         start: function (element, ui) {
           ui.item.data("index", ui.item.index());
@@ -541,30 +527,36 @@
         getColors().then(() => {
           drawTasksCategory();
           drawCategoriesColors();
-          const id = parseInt($(e.relatedTarget).parents(".card-task").attr("data-id")),
-                  category = parseInt($(e.relatedTarget).parents(".card-task").attr("data-category")),
+          const id = parseInt($(e.relatedTarget).attr("data-id") ?? 0),
                   modal = $(this),
                   form = modal.find("form");
+          let category = parseInt($(e.relatedTarget).parents(".card-category").attr("data-id") ?? 0);
+          if (category === 0) {
+            for (let c of categories.values()) {
+              if (c.tasks.has(id)) {
+                category = c.id;
+                break;
+              }
+            }
+          }
+          removeErrors(form);
           form[0].reset();
+          form.data("id", id);
+          form.data("category", category);
           $(".summernote").summernote("reset");
           if (id > 0) {
-            form.attr("data-id", id);
-            form.attr("data-category", category);
             modal.find(".btn-danger").show();
             fillFields(categories.get(category).tasks.get(id), form);
           } else {
-            form.removeAttr("data-id");
-            form.removeAttr("data-category");
             form.find('[name="category"]').val(category);
             modal.find(".btn-danger").hide();
           }
         });
       });
-
       $("#tasks-form").submit(function (e) {
         const submitter = $(e.originalEvent.submitter),
-                id = parseInt($(this).attr("data-id")),
-                category = parseInt($(this).attr("data-category"));
+                id = $(this).data("id"),
+                category = $(this).data("category");
         let url = api.tasks();
         if (id > 0) {
           url += "/" + id;
@@ -578,7 +570,7 @@
         } else {
           (id > 0 ? put : post)(url, this).then((task) => {
             categories.get(task.category).tasks.set(task.id, task);
-            if (task.category !== category) {
+            if (category > 0 && category !== task.category) {
               categories.get(category).tasks.delete(task.id);
             }
             drawCategories();
