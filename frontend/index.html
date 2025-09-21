@@ -78,13 +78,18 @@
       <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title">Управление цветом</h4>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Закрыть">
-            <span aria-hidden="true">&times;</span>
-          </button>
+          <div class="ml-auto">
+            <button type="submit" class="btn text-danger colors-hidden" form="colors-form" title="Удалить цвет">
+              <i class="fas fa-trash"></i>
+            </button>
+            <button type="button" class="btn" data-dismiss="modal" aria-label="Закрыть">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
         </div>
         <div class="modal-body">
           <label>Добавленные цвета</label>
-          <ul class="d-flex colors-colors">
+          <ul class="d-flex flex-wrap colors-colors">
             <li data-hex="#6c757d" style="color: #6c757d" title="Добавить цвет"><i class="fas fa-plus-square"></i></li>
           </ul>
           <form action="#" method="post" id="colors-form" class="mt-3 colors-hidden">
@@ -93,13 +98,6 @@
               <input type="color" name="hex" id="colors-hex" class="form-control">
             </div>
           </form>
-        </div>
-        <div class="modal-footer justify-content-between">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
-          <div>
-            <button type="submit" class="btn btn-danger colors-hidden" form="colors-form">Удалить</button>
-            <button type="submit" class="btn btn-success colors-hidden" form="colors-form">Сохранить</button>
-          </div>
         </div>
       </div>
     </div>
@@ -110,9 +108,14 @@
       <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title">Управление категорией</h4>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Закрыть">
-            <span aria-hidden="true">&times;</span>
-          </button>
+          <div class="ml-auto">
+            <button type="submit" class="btn text-danger" form="categories-form" title="Удалить категорию">
+              <i class="fas fa-trash"></i>
+            </button>
+            <button type="button" class="btn" data-dismiss="modal" aria-label="Закрыть">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
         </div>
         <div class="modal-body">
           <form action="#" method="post" id="categories-form" class="mt-3">
@@ -122,16 +125,9 @@
             </div>
             <div class="form-group">
               <label>Цвет</label>
-              <ul class="d-flex categories-colors"></ul>
+              <ul class="d-flex flex-wrap categories-colors"></ul>
             </div>
           </form>
-        </div>
-        <div class="modal-footer justify-content-between">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
-          <div>
-            <button type="submit" class="btn btn-danger" form="categories-form">Удалить</button>
-            <button type="submit" class="btn btn-success" form="categories-form">Сохранить</button>
-          </div>
         </div>
       </div>
     </div>
@@ -142,9 +138,14 @@
       <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title">Управление задачей</h4>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Закрыть">
-            <span aria-hidden="true">&times;</span>
-          </button>
+          <div class="ml-auto">
+            <button type="submit" class="btn text-danger" form="tasks-form" title="Удалить задачу">
+              <i class="fas fa-trash"></i>
+            </button>
+            <button type="button" class="btn" data-dismiss="modal" aria-label="Закрыть">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
         </div>
         <div class="modal-body">
           <form action="#" method="post" id="tasks-form" class="mt-3">
@@ -162,7 +163,7 @@
             </div>
             <div class="form-group">
               <label>Цвет</label>
-              <ul class="d-flex categories-colors"></ul>
+              <ul class="d-flex flex-wrap categories-colors"></ul>
             </div>
             <div class="form-group">
               <div class="custom-control custom-switch custom-switch-on-success">
@@ -171,13 +172,6 @@
               </div>
             </div>
           </form>
-        </div>
-        <div class="modal-footer justify-content-between">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
-          <div>
-            <button type="submit" class="btn btn-danger" form="tasks-form">Удалить</button>
-            <button type="submit" class="btn btn-success" form="tasks-form">Сохранить</button>
-          </div>
         </div>
       </div>
     </div>
@@ -208,6 +202,33 @@
         return false;
       });
 
+      // Базовая логика для форм
+      $("form")
+              .on("input", 'input:not([type="color"]), select, textarea', function () {
+                $(this).parents("form").submit();
+              })
+              .on("change", 'input[type="color"]', function () {
+                $(this).parents("form").submit();
+              })
+              .on("keydown", function (e) {
+                if (e.keyCode === 13) return false;
+              });
+      const fillFields = (object, form) => {
+        Object.entries(object).forEach(([key, value]) => {
+          const input = form.find('[name="' + key + '"]'),
+                  val = value?.id ?? value;
+          if (input.attr("type") === "radio" || input.attr("type") === "checkbox") {
+            input.filter('[value="' + val + '"]').prop("checked", true);
+          } else if (input.is("select")) {
+            input.find('[value="' + val + '"]').prop("selected", true);
+          } else if (input.hasClass("summernote")) {
+            input.summernote("code", val);
+          } else {
+            input.val(val);
+          }
+        });
+      };
+
       // Управление цветом
       let colors;
       const getColors = async () => {
@@ -236,6 +257,7 @@
       };
       const hideColorsHidden = () => {
         $(".colors-hidden").hide();
+        $(".colors-colors li").removeClass("active");
       };
       $("#colors").on("show.bs.modal", function () {
         hideColorsHidden();
@@ -248,21 +270,23 @@
                 id = parseInt(color.attr("data-id") ?? 0),
                 modal = color.parents(".modal"),
                 form = modal.find("form");
+        $(".colors-colors li").removeClass("active");
+        color.addClass("active");
         form.data("id", id);
         form.find('[name="hex"]').val(color.attr("data-hex"));
         removeErrors(form);
         form.show();
         modal.find(".btn-success").show();
-        modal.find(".btn-danger").toggle(id > 0);
+        $('[form="' + form.attr("id") + '"]').toggle(id > 0);
       });
       $("#colors-form").submit(function (e) {
-        const submitter = $(e.originalEvent.submitter),
+        const isDelete = !!e.originalEvent,
                 id = $(this).data("id");
         let url = api.colors();
         if (id > 0) {
           url += "/" + id;
         }
-        if (submitter.hasClass("btn-danger")) {
+        if (isDelete) {
           del(url).then(() => {
             colors.delete(id);
             drawColors();
@@ -283,7 +307,14 @@
           (id > 0 ? put : post)(url, this).then((color) => {
             colors.set(color.id, color);
             drawColors();
-            hideColorsHidden();
+            if (id === 0) {
+              $(".colors-colors li")
+                      .removeClass("active")
+                      .filter('[data-id="' + color.id + '"]')
+                      .addClass("active");
+              $(this).data("id", color.id);
+              $('[form="' + $(this).attr("id") + '"]').show();
+            }
             if (id > 0) {
               categories.forEach((category) => {
                 if (category.color?.id === id) {
@@ -434,21 +465,6 @@
           );
         });
       };
-      const fillFields = (object, form) => {
-        Object.entries(object).forEach(([key, value]) => {
-          const input = form.find('[name="' + key + '"]'),
-                  val = value?.id ?? value;
-          if (input.attr("type") === "radio" || input.attr("type") === "checkbox") {
-            input.filter('[value="' + val + '"]').prop("checked", true);
-          } else if (input.is("select")) {
-            input.find('[value="' + val + '"]').prop("selected", true);
-          } else if (input.hasClass("summernote")) {
-            input.summernote("code", val);
-          } else {
-            input.val(val);
-          }
-        });
-      };
       $("#categories").on("show.bs.modal", function (e) {
         getColors().then(() => {
           drawCategoriesColors();
@@ -459,21 +475,21 @@
           form[0].reset();
           form.data("id", id);
           if (id > 0) {
-            modal.find(".btn-danger").toggle(categories.get(id).tasks.size === 0);
+            $('[form="' + form.attr("id") + '"]').toggle(categories.get(id).tasks.size === 0);
             fillFields(categories.get(id), form);
           } else {
-            modal.find(".btn-danger").hide();
+            $('[form="' + form.attr("id") + '"]').hide();
           }
         });
       });
       $("#categories-form").submit(function (e) {
-        const submitter = $(e.originalEvent.submitter),
+        const isDelete = !!e.originalEvent,
                 id = $(this).data("id");
         let url = api.categories();
         if (id > 0) {
           url += "/" + id;
         }
-        if (submitter.hasClass("btn-danger")) {
+        if (isDelete) {
           del(url).then(() => {
             categories.delete(id);
             drawCategories();
@@ -485,8 +501,11 @@
                     ? categories.get(category.id).tasks
                     : new Map();
             categories.set(category.id, category);
+            if (id === 0) {
+              $(this).data("id", category.id);
+              $('[form="' + $(this).attr("id") + '"]').show();
+            }
             drawCategories();
-            hideModal();
           });
         }
         return false;
@@ -545,23 +564,23 @@
           form.data("category", category);
           $(".summernote").summernote("reset");
           if (id > 0) {
-            modal.find(".btn-danger").show();
+            $('[form="' + form.attr("id") + '"]').show();
             fillFields(categories.get(category).tasks.get(id), form);
           } else {
             form.find('[name="category"]').val(category);
-            modal.find(".btn-danger").hide();
+            $('[form="' + form.attr("id") + '"]').hide();
           }
         });
       });
       $("#tasks-form").submit(function (e) {
-        const submitter = $(e.originalEvent.submitter),
+        const isDelete = !!e.originalEvent,
                 id = $(this).data("id"),
                 category = $(this).data("category");
         let url = api.tasks();
         if (id > 0) {
           url += "/" + id;
         }
-        if (submitter.hasClass("btn-danger")) {
+        if (isDelete) {
           del(url).then(() => {
             categories.get(category).tasks.delete(id);
             drawCategories();
@@ -573,8 +592,11 @@
             if (category > 0 && category !== task.category) {
               categories.get(category).tasks.delete(task.id);
             }
+            if (id === 0) {
+              $(this).data("id", task.id);
+              $('[form="' + $(this).attr("id") + '"]').show();
+            }
             drawCategories();
-            hideModal();
           });
         }
         return false;

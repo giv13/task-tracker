@@ -23,6 +23,7 @@
 .categories-colors input {
     display: none;
 }
+.colors-colors li.active i:before,
 .categories-colors input:checked + i:before {
     content: "\f14a";
 }
