@@ -18,8 +18,14 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
+      KAFKA_BOOTSTRAP_SERVERS: broker-1:9092,broker-2:9092,broker-3:9092
+      KAFKA_USER_REGISTERED_TOPIC_NAME: ${KAFKA_USER_REGISTERED_TOPIC_NAME}
+      KAFKA_USER_LOGGED_IN_TOPIC_NAME: ${KAFKA_USER_LOGGED_IN_TOPIC_NAME}
     depends_on:
       - db
+      - broker-1
+      - broker-2
+      - broker-3
   db:
     image: postgres:17.5-alpine
     restart: always
@@ -29,12 +35,67 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
   adminer:
-    image: adminer
+    image: adminer:latest
     restart: always
     depends_on:
       - db
+  broker-1:
+    image: apache/kafka:4.1.0
+    environment:
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_NODE_ID: 1
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker-1:9093,2@broker-2:9093,3@broker-3:9093
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker-1:9092,CONTROLLER://broker-1:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+    volumes:
+      - broker-1-data:/tmp
+  broker-2:
+    image: apache/kafka:4.1.0
+    environment:
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_NODE_ID: 2
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker-1:9093,2@broker-2:9093,3@broker-3:9093
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker-2:9092,CONTROLLER://broker-2:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+    volumes:
+      - broker-2-data:/tmp
+  broker-3:
+    image: apache/kafka:4.1.0
+    environment:
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_NODE_ID: 3
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker-1:9093,2@broker-2:9093,3@broker-3:9093
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker-3:9092,CONTROLLER://broker-3:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+    volumes:
+      - broker-3-data:/tmp
+  kafka-ui:
+    image: kafbat/kafka-ui:latest
+    restart: always
+    environment:
+      - SERVER_SERVLET_CONTEXT_PATH=/kafka
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=broker-1:9092,broker-2:9092,broker-3:9092
+      - KAFKA_CLUSTERS_0_DEFAULTKEYSERDE=Int32
+      - KAFKA_CLUSTERS_0_DEFAULTVALUESERDE=String
+      - AUTH_TYPE=LOGIN_FORM
+      - SPRING_SECURITY_USER_NAME=${KAFKA_UI_USER}
+      - SPRING_SECURITY_USER_PASSWORD=${KAFKA_UI_PASSWORD}
+    depends_on:
+      - broker-1
+      - broker-2
+      - broker-3
 
 volumes:
-  postgres_data:
+  db-data:
+  broker-1-data:
+  broker-2-data:
+  broker-3-data:

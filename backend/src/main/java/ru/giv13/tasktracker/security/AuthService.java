@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,26 +22,36 @@ public class AuthService {
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final KafkaTemplate<Integer, UserResponseDto> kafkaTemplate;
     private final JwtService jwtService;
     private final UserService userService;
+
+    @Value("${spring.kafka.topics.user.registered}")
+    private String userRegisteredTopicName;
+
+    @Value("${spring.kafka.topics.user.logged-in}")
+    private String userLoggedInTopicName;
+
     @Value("${security.jwt.refresh.token-name}")
     private String jwtRefreshTokenName;
 
     public UserResponseDto register(UserRequestDto userRequestDto) {
         User user = modelMapper.map(userRequestDto, User.class);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return auth(user);
+        return auth(user, userRegisteredTopicName);
     }
 
     public UserResponseDto login(UserRequestDto userRequestDto) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userRequestDto.getEmail(), userRequestDto.getPassword()));
         User user = (User) authentication.getPrincipal();
-        return auth(user);
+        return auth(user, userLoggedInTopicName);
     }
 
-    private UserResponseDto auth(User user) {
+    private UserResponseDto auth(User user, String topic) {
         user.setRefresh(jwtService.generateCookie(user));
-        return modelMapper.map(userRepository.save(user), UserResponseDto.class);
+        UserResponseDto userResponseDto = modelMapper.map(userRepository.save(user), UserResponseDto.class);
+        kafkaTemplate.send(topic, user.getId(), userResponseDto);
+        return userResponseDto;
     }
 
     public void refresh(HttpServletRequest request) throws JwtException {
