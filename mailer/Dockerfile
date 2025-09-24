@@ -8,10 +8,10 @@ RUN cd common && mvn dependency:go-offline -B
 COPY common/src ./common/src
 RUN cd common && mvn install -DskipTests -B
 
-COPY backend/pom.xml .
+COPY mailer/pom.xml .
 RUN mvn dependency:go-offline -B
 
-COPY backend/src ./src
+COPY mailer/src ./src
 RUN mvn package -DskipTests -B
 
 FROM eclipse-temurin:21-jre-alpine

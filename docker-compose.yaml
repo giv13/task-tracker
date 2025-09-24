@@ -10,7 +10,9 @@ services:
     depends_on:
       - backend
   backend:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
     restart: always
     environment:
       DB_HOST: db
@@ -23,6 +25,19 @@ services:
       KAFKA_USER_LOGGED_IN_TOPIC_NAME: ${KAFKA_USER_LOGGED_IN_TOPIC_NAME}
     depends_on:
       - db
+      - broker-1
+      - broker-2
+      - broker-3
+  mailer:
+    build:
+      context: .
+      dockerfile: ./mailer/Dockerfile
+    restart: always
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: broker-1:9092,broker-2:9092,broker-3:9092
+      KAFKA_USER_REGISTERED_TOPIC_NAME: ${KAFKA_USER_REGISTERED_TOPIC_NAME}
+      KAFKA_USER_LOGGED_IN_TOPIC_NAME: ${KAFKA_USER_LOGGED_IN_TOPIC_NAME}
+    depends_on:
       - broker-1
       - broker-2
       - broker-3

@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: task-tracker-mailer
+    version: 1.0.0
+
+  config:
+    import: optional:file:.env[.properties]
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    consumer:
+      group-id: mailer
+      key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: ru.giv13.common.event
+    topics:
+      user:
+        registered: ${KAFKA_USER_REGISTERED_TOPIC_NAME}
+        logged-in: ${KAFKA_USER_LOGGED_IN_TOPIC_NAME}
+
+server:
+  port: 8081
