@@ -19,5 +19,20 @@ spring:
         registered: ${KAFKA_USER_REGISTERED_TOPIC_NAME}
         logged-in: ${KAFKA_USER_LOGGED_IN_TOPIC_NAME}
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${SMTP_GMAIL_USERNAME}
+    password: ${SMTP_GMAIL_PASSWORD}
+    sender:
+      email: ${SMTP_SENDER_EMAIL:${SMTP_GMAIL_USERNAME}}
+      name: ${SMTP_SENDER_NAME:Task tracker}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 server:
   port: 8081
