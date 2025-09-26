@@ -173,6 +173,10 @@
             </div>
           </form>
         </div>
+        <div class="modal-footer justify-content-between text-sm text-muted">
+          <div data-name="createdAt">Создана: <span class="text-dark"></span></div>
+          <div data-name="completedAt">Завершена: <span class="text-dark"></span></div>
+        </div>
       </div>
     </div>
   </div>
@@ -227,6 +231,25 @@
             input.val(val);
           }
         });
+      };
+      const fillFooter = (object, modal) => {
+        const footer = modal.find(".modal-footer");
+        let counter = 0;
+        Object.entries(object).forEach(([key, value]) => {
+          const el = footer.find('[data-name="' + key + '"]');
+          el.toggle(!!value).find("span").html(isoToString(value));
+          if (el.length && value) counter++;
+        });
+        footer.toggle(counter !== 0);
+      };
+      const isoToString = (iso) => {
+        const date = new Date(iso),
+                day = String(date.getDate()).padStart(2, "0"),
+                month = String(date.getMonth() + 1).padStart(2, "0"),
+                year = date.getFullYear(),
+                hours = String(date.getHours()).padStart(2, "0"),
+                minutes = String(date.getMinutes()).padStart(2, "0");
+        return day + "." + month + "." + year + " в " + hours + ":" + minutes;
       };
 
       // Управление цветом
@@ -541,6 +564,11 @@
       };
       $(".summernote").summernote({
         height: 150,
+        callbacks: {
+          onBlur: function () {
+            $(this).trigger("input");
+          },
+        },
       });
       $("#tasks").on("show.bs.modal", function (e) {
         getColors().then(() => {
@@ -566,9 +594,11 @@
           if (id > 0) {
             $('[form="' + form.attr("id") + '"]').show();
             fillFields(categories.get(category).tasks.get(id), form);
+            fillFooter(categories.get(category).tasks.get(id), modal);
           } else {
             form.find('[name="category"]').val(category);
             $('[form="' + form.attr("id") + '"]').hide();
+            fillFooter({}, modal);
           }
         });
       });
@@ -596,6 +626,7 @@
               $(this).data("id", task.id);
               $('[form="' + $(this).attr("id") + '"]').show();
             }
+            fillFooter(task, $(this).parents(".modal"));
             drawCategories();
           });
         }

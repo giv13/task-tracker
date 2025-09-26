@@ -3,11 +3,14 @@ package ru.giv13.tasktracker.task;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import ru.giv13.tasktracker.category.Category;
 import ru.giv13.tasktracker.color.Color;
 import ru.giv13.tasktracker.user.User;
+
+import java.time.Instant;
 
 @Entity
 @Data
@@ -25,9 +28,6 @@ public class Task {
     @ColumnDefault("0")
     private Integer index;
 
-    @ColumnDefault("false")
-    private boolean isDone;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_task_color_id"))
     @OnDelete(action = OnDeleteAction.SET_NULL)
@@ -41,4 +41,17 @@ public class Task {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_task_user_id"))
     private User user;
+
+    @CreationTimestamp
+    private Instant createdAt;
+
+    private Instant completedAt;
+
+    public void setDone(boolean done) {
+        completedAt = done ? Instant.now() : null;
+    }
+
+    public boolean getDone() {
+        return completedAt != null;
+    }
 }

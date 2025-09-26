@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: update-task-table-add-timestamps
+      author: giv13
+      changes:
+        - addColumn:
+            tableName: task
+            columns:
+              - column:
+                  name: created_at
+                  type: timestamptz(6)
+              - column:
+                  name: completed_at
+                  type: timestamptz(6)
+        - sql:
+            sql: UPDATE task SET created_at = NOW(); UPDATE task SET completed_at = NOW() WHERE is_done = true;
+        - dropColumn:
+            tableName: task
+            columns:
+              - column:
+                  name: is_done
+      rollback:
+        - addColumn:
+            tableName: task
+            columns:
+              - column:
+                  name: is_done
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+        - sql:
+            sql: UPDATE task SET is_done = true WHERE completed_at IS NOT NULL;
+        - dropColumn:
+            tableName: task
+            columns:
+              - column:
+                  name: completed_at
+              - column:
+                  name: created_at

@@ -5,14 +5,25 @@ import lombok.Getter;
 import lombok.Setter;
 import ru.giv13.tasktracker.color.ColorResponseDto;
 
+import java.time.Instant;
+
 @Getter
 @Setter
 public class TaskResponseDto {
     private Integer id;
+
     private String name;
+
     private String notes;
+
     private boolean isDone;
+
     private ColorResponseDto color;
+
     @JsonProperty("category")
     private Integer categoryId;
+
+    private Instant createdAt;
+
+    private Instant completedAt;
 }
