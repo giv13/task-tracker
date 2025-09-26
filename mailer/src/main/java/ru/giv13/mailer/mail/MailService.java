@@ -8,12 +8,16 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
+import ru.giv13.mailer.exception.NonRetryableException;
+import ru.giv13.mailer.exception.RetryableException;
 
 import java.io.IOException;
+import java.util.function.Supplier;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +30,19 @@ public class MailService {
 
     @Value("${spring.mail.sender.name}")
     private String senderName;
+
+    public void sendEmail(Supplier<Mail> mailSupplier) {
+        try {
+            Mail mail = mailSupplier.get();
+            sendEmail(mail);
+        } catch (MailSendException e) {
+            System.out.println("Ошибка: " + e.getMessage());
+            throw new RetryableException(e);
+        } catch (Exception e) {
+            System.out.println("Ошибка: " + e.getMessage());
+            throw new NonRetryableException(e);
+        }
+    }
 
     public void sendEmail(Mail mail) throws IOException, TemplateException, MessagingException {
         Template template = freemarkerConfig.getTemplate(mail.getTemplate());

@@ -8,7 +8,6 @@ import ru.giv13.common.event.UserRegisteredEvent;
 import ru.giv13.mailer.mail.Mail;
 import ru.giv13.mailer.mail.MailService;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Component
@@ -18,38 +17,28 @@ public class UserEventHandler {
 
     @KafkaListener(topics = "${spring.kafka.topics.user.registered}")
     public void userRegistered(UserRegisteredEvent userRegisteredEvent) {
-        Map<String, String> model = new HashMap<>();
-        model.put("userName", userRegisteredEvent.getName());
-        model.put("userEmail", userRegisteredEvent.getEmail());
-        model.put("userPassword", userRegisteredEvent.getPassword());
-        Mail mail = new Mail(
+        mailService.sendEmail(() -> new Mail(
                 "user/registered.ftlh",
                 userRegisteredEvent.getEmail(),
                 "Добро пожаловать!",
-                model
-        );
-        try {
-            mailService.sendEmail(mail);
-        } catch (Exception e) {
-            System.out.println("Ошибка: " + e.getMessage());
-        }
+                Map.of(
+                        "userName", userRegisteredEvent.getName(),
+                        "userEmail", userRegisteredEvent.getEmail(),
+                        "userPassword", userRegisteredEvent.getPassword()
+                )
+        ));
     }
 
     @KafkaListener(topics = "${spring.kafka.topics.user.logged-in}")
     public void userLoggedIn(UserLoggedInEvent userLoggedInEvent) {
-        Map<String, String> model = new HashMap<>();
-        model.put("userName", userLoggedInEvent.getName());
-        model.put("userIp", userLoggedInEvent.getIp());
-        Mail mail = new Mail(
+        mailService.sendEmail(() -> new Mail(
                 "user/logged-in.ftlh",
                 userLoggedInEvent.getEmail(),
                 "Уведомление о входе",
-                model
-        );
-        try {
-            mailService.sendEmail(mail);
-        } catch (Exception e) {
-            System.out.println("Ошибка: " + e.getMessage());
-        }
+                Map.of(
+                        "userName", userLoggedInEvent.getName(),
+                        "userIp", userLoggedInEvent.getIp()
+                )
+        ));
     }
 }
