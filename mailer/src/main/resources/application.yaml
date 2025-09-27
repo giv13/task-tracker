@@ -22,14 +22,15 @@ spring:
       user:
         registered: ${KAFKA_USER_REGISTERED_TOPIC_NAME}
         logged-in: ${KAFKA_USER_LOGGED_IN_TOPIC_NAME}
+        task-summary: ${KAFKA_USER_TASK_SUMMARY_TOPIC_NAME}
 
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${SMTP_GMAIL_USERNAME}
-    password: ${SMTP_GMAIL_PASSWORD}
+    host: ${SMTP_HOST}
+    port: ${SMTP_PORT}
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
     sender:
-      email: ${SMTP_SENDER_EMAIL:${SMTP_GMAIL_USERNAME}}
+      email: ${SMTP_SENDER_EMAIL:${SMTP_USERNAME}}
       name: ${SMTP_SENDER_NAME:Task tracker}
     properties:
       mail:

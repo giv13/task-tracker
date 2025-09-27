@@ -23,6 +23,9 @@ public class KafkaConfig {
     @Value("${spring.kafka.topics.user.logged-in}")
     private String userLoggedInTopicName;
 
+    @Value("${spring.kafka.topics.user.task-summary}")
+    private String userTaskSummaryTopicName;
+
     private final Map<String, String> configs = Map.of("min.insync.replicas", "2");
 
     @Bean
@@ -33,6 +36,11 @@ public class KafkaConfig {
     @Bean
     public NewTopic userLoggedInTopic() {
         return new NewTopic(userLoggedInTopicName + "-dlt", 1, (short) 3).configs(configs);
+    }
+
+    @Bean
+    public NewTopic userTaskSummaryTopic() {
+        return new NewTopic(userTaskSummaryTopicName + "-dlt", 1, (short) 3).configs(configs);
     }
 
     @Bean

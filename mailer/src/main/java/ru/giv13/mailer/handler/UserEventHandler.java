@@ -5,6 +5,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import ru.giv13.common.event.UserLoggedInEvent;
 import ru.giv13.common.event.UserRegisteredEvent;
+import ru.giv13.common.event.UserTaskSummaryEvent;
 import ru.giv13.mailer.mail.Mail;
 import ru.giv13.mailer.mail.MailService;
 
@@ -38,6 +39,20 @@ public class UserEventHandler {
                 Map.of(
                         "userName", userLoggedInEvent.getName(),
                         "userIp", userLoggedInEvent.getIp()
+                )
+        ));
+    }
+
+    @KafkaListener(topics = "${spring.kafka.topics.user.task-summary}")
+    public void userTaskSummary(UserTaskSummaryEvent userTaskSummaryEvent) {
+        mailService.sendEmail(() -> new Mail(
+                "user/task-summary.ftlh",
+                userTaskSummaryEvent.getEmail(),
+                "Итоги дня",
+                Map.of(
+                        "userName", userTaskSummaryEvent.getName(),
+                        "completed", userTaskSummaryEvent.getCompleted().toString(),
+                        "uncompleted", userTaskSummaryEvent.getUncompleted().toString()
                 )
         ));
     }
