@@ -28,6 +28,23 @@ services:
       - broker-1
       - broker-2
       - broker-3
+  scheduler:
+    build:
+      context: .
+      dockerfile: ./scheduler/Dockerfile
+    restart: always
+    environment:
+      DB_HOST: db
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      KAFKA_BOOTSTRAP_SERVERS: broker-1:9092,broker-2:9092,broker-3:9092
+      KAFKA_USER_TASK_SUMMARY_TOPIC_NAME: ${KAFKA_USER_TASK_SUMMARY_TOPIC_NAME}
+    depends_on:
+      - db
+      - broker-1
+      - broker-2
+      - broker-3
   mailer:
     build:
       context: .

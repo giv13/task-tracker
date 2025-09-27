@@ -7,10 +7,9 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class UserRegisteredEvent {
+public class UserTaskSummaryEvent {
     private String name;
-
     private String email;
-
-    private String password;
+    private Integer completed;
+    private Integer uncompleted;
 }
