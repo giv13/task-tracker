@@ -41,6 +41,10 @@ spring:
   messages:
     basename: properties.validation
 
+encryptor:
+  password: ${ENCRYPTOR_PASSWORD}
+  salt: ${ENCRYPTOR_SALT}
+
 security:
   jwt:
     secret: ${JWT_SECRET}

@@ -1,7 +1,9 @@
 package ru.giv13.mailer.handler;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.stereotype.Component;
 import ru.giv13.common.event.UserLoggedInEvent;
 import ru.giv13.common.event.UserRegisteredEvent;
@@ -16,6 +18,12 @@ import java.util.Map;
 public class UserEventHandler {
     private final MailService mailService;
 
+    @Value("${encryptor.password}")
+    private String encryptorPassword;
+
+    @Value("${encryptor.salt}")
+    private String encryptorSalt;
+
     @KafkaListener(topics = "${spring.kafka.topics.user.registered}")
     public void userRegistered(UserRegisteredEvent userRegisteredEvent) {
         mailService.sendEmail(() -> new Mail(
@@ -25,7 +33,7 @@ public class UserEventHandler {
                 Map.of(
                         "userName", userRegisteredEvent.getName(),
                         "userEmail", userRegisteredEvent.getEmail(),
-                        "userPassword", userRegisteredEvent.getPassword()
+                        "userPassword", Encryptors.delux(encryptorPassword, encryptorSalt).decrypt(userRegisteredEvent.getPassword())
                 )
         ));
     }

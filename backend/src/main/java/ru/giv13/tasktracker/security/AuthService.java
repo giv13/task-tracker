@@ -9,6 +9,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,12 @@ public class AuthService {
     private final JwtService jwtService;
     private final UserService userService;
 
+    @Value("${encryptor.password}")
+    private String encryptorPassword;
+
+    @Value("${encryptor.salt}")
+    private String encryptorSalt;
+
     @Value("${spring.kafka.topics.user.registered}")
     private String userRegisteredTopicName;
 
@@ -48,7 +55,7 @@ public class AuthService {
         UserRegisteredEvent userRegisteredEvent = new UserRegisteredEvent()
                 .setName(user.getName())
                 .setEmail(user.getEmail())
-                .setPassword(userRequestDto.getPassword());
+                .setPassword(Encryptors.delux(encryptorPassword, encryptorSalt).encrypt(userRequestDto.getPassword()));
         kafkaUserRegisteredTemplate.send(userRegisteredTopicName, user.getId(), userRegisteredEvent);
 
         return userResponseDto;

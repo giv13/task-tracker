@@ -40,5 +40,9 @@ spring:
           starttls:
             enable: true
 
+encryptor:
+  password: ${ENCRYPTOR_PASSWORD}
+  salt: ${ENCRYPTOR_SALT}
+
 server:
   port: 8082
