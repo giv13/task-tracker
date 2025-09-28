@@ -1,6 +1,7 @@
 package ru.giv13.mailer.system;
 
 import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,30 +18,14 @@ import java.util.Map;
 
 @Configuration
 public class KafkaConfig {
-    @Value("${spring.kafka.topics.user.registered}")
-    private String userRegisteredTopicName;
-
-    @Value("${spring.kafka.topics.user.logged-in}")
-    private String userLoggedInTopicName;
-
-    @Value("${spring.kafka.topics.user.task-summary}")
-    private String userTaskSummaryTopicName;
+    @Value("${spring.kafka.topics.user.dlt}")
+    private String userDltTopicName;
 
     private final Map<String, String> configs = Map.of("min.insync.replicas", "2");
 
     @Bean
     public NewTopic userRegisteredTopic() {
-        return new NewTopic(userRegisteredTopicName + "-dlt", 1, (short) 3).configs(configs);
-    }
-
-    @Bean
-    public NewTopic userLoggedInTopic() {
-        return new NewTopic(userLoggedInTopicName + "-dlt", 1, (short) 3).configs(configs);
-    }
-
-    @Bean
-    public NewTopic userTaskSummaryTopic() {
-        return new NewTopic(userTaskSummaryTopicName + "-dlt", 1, (short) 3).configs(configs);
+        return new NewTopic(userDltTopicName, 1, (short) 3).configs(configs);
     }
 
     @Bean
@@ -49,7 +34,7 @@ public class KafkaConfig {
             KafkaTemplate<Integer, Object> kafkaTemplate
     ) {
         DefaultErrorHandler errorHandler = new DefaultErrorHandler(
-                new DeadLetterPublishingRecoverer(kafkaTemplate),
+                new DeadLetterPublishingRecoverer(kafkaTemplate, (consumerRecord, exception) -> new TopicPartition(userDltTopicName, -1)),
                 new FixedBackOff(3000, 3)
         );
         errorHandler.addNotRetryableExceptions(NonRetryableException.class);
