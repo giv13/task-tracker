@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.stereotype.Component;
-import ru.giv13.common.event.UserLoggedInEvent;
+import ru.giv13.common.event.UserPasswordChangedEvent;
 import ru.giv13.common.event.UserRegisteredEvent;
 import ru.giv13.common.event.UserTaskSummaryEvent;
 import ru.giv13.mailer.mail.Mail;
@@ -38,15 +38,16 @@ public class UserEventHandler {
         ));
     }
 
-    @KafkaListener(topics = "${spring.kafka.topics.user.logged-in}")
-    public void userLoggedIn(UserLoggedInEvent userLoggedInEvent) {
+    @KafkaListener(topics = "${spring.kafka.topics.user.password-changed}")
+    public void userPasswordChanged(UserPasswordChangedEvent userPasswordChangedEvent) {
         mailService.sendEmail(() -> new Mail(
-                "user/logged-in.ftlh",
-                userLoggedInEvent.getEmail(),
-                "Уведомление о входе",
+                "user/password-changed.ftlh",
+                userPasswordChangedEvent.getEmail(),
+                "Ваш пароль изменен!",
                 Map.of(
-                        "userName", userLoggedInEvent.getName(),
-                        "userIp", userLoggedInEvent.getIp()
+                        "userName", userPasswordChangedEvent.getName(),
+                        "userEmail", userPasswordChangedEvent.getEmail(),
+                        "userPassword", Encryptors.delux(encryptorPassword, encryptorSalt).decrypt(userPasswordChangedEvent.getPassword())
                 )
         ));
     }

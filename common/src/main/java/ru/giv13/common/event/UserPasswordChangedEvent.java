@@ -7,10 +7,10 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class UserLoggedInEvent {
+public class UserPasswordChangedEvent {
     private String name;
 
     private String email;
 
-    private String ip;
+    private String password;
 }

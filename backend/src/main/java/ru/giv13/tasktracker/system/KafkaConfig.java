@@ -12,8 +12,8 @@ public class KafkaConfig {
     @Value("${spring.kafka.topics.user.registered}")
     private String userRegisteredTopicName;
 
-    @Value("${spring.kafka.topics.user.logged-in}")
-    private String userLoggedInTopicName;
+    @Value("${spring.kafka.topics.user.password-changed}")
+    private String userPasswordChangedTopicName;
 
     private final Map<String, String> configs = Map.of("min.insync.replicas", "2");
 
@@ -23,7 +23,7 @@ public class KafkaConfig {
     }
 
     @Bean
-    public NewTopic userLoggedInTopic() {
-        return new NewTopic(userLoggedInTopicName, 1, (short) 3).configs(configs);
+    public NewTopic userPasswordChangedTopic() {
+        return new NewTopic(userPasswordChangedTopicName, 1, (short) 3).configs(configs);
     }
 }

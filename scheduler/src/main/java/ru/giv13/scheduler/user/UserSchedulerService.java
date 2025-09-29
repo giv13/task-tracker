@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserSchedulerService {
     private final UserRepository userRepository;
-    private final KafkaTemplate<Integer, UserTaskSummaryEvent> kafkaUserRegisteredTemplate;
+    private final KafkaTemplate<Integer, UserTaskSummaryEvent> kafkaTemplate;
 
     @Value("${spring.kafka.topics.user.task-summary}")
     private String userTaskSummaryTopicName;
@@ -30,7 +30,7 @@ public class UserSchedulerService {
                         .setEmail(user.getEmail())
                         .setCompleted(user.getCompleted())
                         .setUncompleted(user.getUncompleted());
-                kafkaUserRegisteredTemplate.send(userTaskSummaryTopicName, user.getId(), userTaskSummaryEvent);
+                kafkaTemplate.send(userTaskSummaryTopicName, user.getId(), userTaskSummaryEvent);
             }
         }
     }

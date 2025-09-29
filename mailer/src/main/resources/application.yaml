@@ -21,7 +21,7 @@ spring:
     topics:
       user:
         registered: ${KAFKA_USER_REGISTERED_TOPIC_NAME}
-        logged-in: ${KAFKA_USER_LOGGED_IN_TOPIC_NAME}
+        password-changed: ${KAFKA_USER_PASSWORD_CHANGED_TOPIC_NAME}
         task-summary: ${KAFKA_USER_TASK_SUMMARY_TOPIC_NAME}
         dlt: ${KAFKA_USER_DLT_TOPIC_NAME}
 

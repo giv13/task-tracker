@@ -13,9 +13,6 @@ import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-import ru.giv13.common.event.UserLoggedInEvent;
 import ru.giv13.common.event.UserRegisteredEvent;
 import ru.giv13.tasktracker.user.*;
 
@@ -27,8 +24,7 @@ public class AuthService {
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final KafkaTemplate<Integer, UserRegisteredEvent> kafkaUserRegisteredTemplate;
-    private final KafkaTemplate<Integer, UserLoggedInEvent> kafkaUserLoggedInTemplate;
+    private final KafkaTemplate<Integer, UserRegisteredEvent> kafkaTemplate;
     private final JwtService jwtService;
     private final UserService userService;
 
@@ -40,9 +36,6 @@ public class AuthService {
 
     @Value("${spring.kafka.topics.user.registered}")
     private String userRegisteredTopicName;
-
-    @Value("${spring.kafka.topics.user.logged-in}")
-    private String userLoggedInTopicName;
 
     @Value("${security.jwt.refresh.token-name}")
     private String jwtRefreshTokenName;
@@ -56,7 +49,7 @@ public class AuthService {
                 .setName(user.getName())
                 .setEmail(user.getEmail())
                 .setPassword(Encryptors.delux(encryptorPassword, encryptorSalt).encrypt(userRequestDto.getPassword()));
-        kafkaUserRegisteredTemplate.send(userRegisteredTopicName, user.getId(), userRegisteredEvent);
+        kafkaTemplate.send(userRegisteredTopicName, user.getId(), userRegisteredEvent);
 
         return userResponseDto;
     }
@@ -64,15 +57,7 @@ public class AuthService {
     public UserResponseDto login(UserRequestDto userRequestDto) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userRequestDto.getEmail(), userRequestDto.getPassword()));
         User user = (User) authentication.getPrincipal();
-        UserResponseDto userResponseDto = auth(user);
-
-        UserLoggedInEvent userLoggedInEvent = new UserLoggedInEvent()
-                .setName(user.getName())
-                .setEmail(user.getEmail())
-                .setIp(getClientIp());
-        kafkaUserLoggedInTemplate.send(userLoggedInTopicName, user.getId(), userLoggedInEvent);
-
-        return userResponseDto;
+        return auth(user);
     }
 
     private UserResponseDto auth(User user) {
@@ -98,21 +83,5 @@ public class AuthService {
 
     public void logout() {
         jwtService.eraseCookie();
-    }
-
-    private String getClientIp() {
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-        HttpServletRequest request = attributes.getRequest();
-        String ip = request.getHeader("X-Forwarded-For");
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("X-Real-IP");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        if ("0:0:0:0:0:0:0:1".equals(ip)) {
-            ip = "127.0.0.1";
-        }
-        return ip;
     }
 }

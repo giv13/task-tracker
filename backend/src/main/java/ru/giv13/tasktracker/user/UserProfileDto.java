@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.giv13.tasktracker.validation.Password;
 import ru.giv13.tasktracker.validation.PasswordConfirmable;
 import ru.giv13.tasktracker.validation.PasswordConfirmation;
@@ -25,8 +24,4 @@ public class UserProfileDto implements PasswordConfirmable {
 
     @NotNull
     private boolean isUnsubscribed;
-
-    public void encodePassword(PasswordEncoder passwordEncoder) {
-        password = password != null && !password.isBlank() ? passwordEncoder.encode(password) : null;
-    }
 }

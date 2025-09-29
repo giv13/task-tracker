@@ -32,7 +32,7 @@ spring:
     topics:
       user:
         registered: ${KAFKA_USER_REGISTERED_TOPIC_NAME}
-        logged-in: ${KAFKA_USER_LOGGED_IN_TOPIC_NAME}
+        password-changed: ${KAFKA_USER_PASSWORD_CHANGED_TOPIC_NAME}
 
   liquibase:
     change-log: db/changelog/changelog-root.yaml
