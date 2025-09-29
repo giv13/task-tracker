@@ -13,10 +13,10 @@ public class Mail {
 
     private final String subject;
 
-    private final Map<String, String> model;
+    private final Map<String, Object> model;
 
-    public Mail(String template, String to, String subject, Map<String, String> model) {
-        Map<String, String> m = new HashMap<>();
+    public Mail(String template, String to, String subject, Map<String, Object> model) {
+        Map<String, Object> m = new HashMap<>();
         m.put("title", subject);
         if (model != null && !model.isEmpty()) {
             m.putAll(model);

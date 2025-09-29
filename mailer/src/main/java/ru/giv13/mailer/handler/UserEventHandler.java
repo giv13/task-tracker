@@ -60,8 +60,8 @@ public class UserEventHandler {
                 "Итоги дня",
                 Map.of(
                         "userName", userTaskSummaryEvent.getName(),
-                        "completed", userTaskSummaryEvent.getCompleted().toString(),
-                        "uncompleted", userTaskSummaryEvent.getUncompleted().toString()
+                        "completed", userTaskSummaryEvent.getCompleted(),
+                        "uncompleted", userTaskSummaryEvent.getUncompleted()
                 )
         ));
     }

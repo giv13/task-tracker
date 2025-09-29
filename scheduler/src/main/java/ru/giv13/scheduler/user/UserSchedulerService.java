@@ -24,12 +24,20 @@ public class UserSchedulerService {
     public void taskSummaries() {
         List<User> users = userRepository.findAllWithTaskSummaries(Instant.now().minus(Duration.ofDays(1)));
         for (User user : users) {
-            if (!user.isUnsubscribed() && (user.getCompleted() > 0 || user.getUncompleted() > 0)) {
+            if (!user.getCompleted().isEmpty() || !user.getUncompleted().isEmpty()) {
                 UserTaskSummaryEvent userTaskSummaryEvent = new UserTaskSummaryEvent()
                         .setName(user.getName())
                         .setEmail(user.getEmail())
-                        .setCompleted(user.getCompleted())
-                        .setUncompleted(user.getUncompleted());
+                        .setCompleted(user.getCompleted().stream().map(task ->
+                                new UserTaskSummaryEvent.Task()
+                                        .setName(task.getName())
+                                        .setNotes(task.getNotes())
+                        ).toList())
+                        .setUncompleted(user.getUncompleted().stream().map(task ->
+                                new UserTaskSummaryEvent.Task()
+                                        .setName(task.getName())
+                                        .setNotes(task.getNotes())
+                        ).toList());
                 kafkaTemplate.send(userTaskSummaryTopicName, user.getId(), userTaskSummaryEvent);
             }
         }

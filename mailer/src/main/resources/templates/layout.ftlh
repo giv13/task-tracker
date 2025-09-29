@@ -166,6 +166,17 @@
 			font-weight: 300;
 			margin: 0;
 		}
+		/*PRODUCT*/
+		.product-wrapper {
+			padding: 20px;
+			border: 1px solid rgba(0,0,0,.05);
+		}
+		.product-wrapper table tr + tr {
+			border-top: 1px solid rgba(0,0,0,.05);
+		}
+		.product-wrapper table tr + tr td h4 {
+			margin-top: 15px !important;
+		}
     </style>
 </head>
 
