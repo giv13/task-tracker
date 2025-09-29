@@ -7,6 +7,7 @@ const api = {
     login: () => `${apiBaseUrl}/auth/login`,
     logout: () => `${apiBaseUrl}/auth/logout`,
     refresh: () => `${apiBaseUrl}/auth/refresh`,
+    users: () => `${apiBaseUrl}/users`,
     colors: () => `${apiBaseUrl}/colors`,
     categories: () => `${apiBaseUrl}/categories`,
     tasks: () => `${apiBaseUrl}/tasks`,

@@ -33,6 +33,7 @@
                 </p>
               </li>
               <li class="user-footer">
+                <a href="#" data-toggle="modal" data-target="#profile" class="btn btn-default btn-flat">Профиль</a>
                 <a href="#" class="btn btn-default btn-flat float-right logout">Выйти</a>
               </li>
             </ul>
@@ -181,6 +182,51 @@
     </div>
   </div>
 
+  <div class="modal fade" id="profile">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Настройки профиля</h4>
+          <div class="ml-auto">
+            <button type="button" class="btn" data-dismiss="modal" aria-label="Закрыть">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+        <div class="modal-body">
+          <form action="#" method="post" id="profile-form" class="mt-3 manual">
+            <div class="form-group">
+              <label for="profile-name">Имя</label>
+              <input type="text" name="name" id="profile-name" class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="profile-email">E-mail</label>
+              <input type="text" name="E-mail" id="profile-email" class="form-control" readonly>
+            </div>
+            <div class="form-group">
+              <label for="profile-password">Новый пароль</label>
+              <input type="password" name="password" id="profile-password" class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="profile-password-confirmation">Повторите новый пароль</label>
+              <input type="password" name="passwordConfirmation" id="profile-password-confirmation" class="form-control">
+            </div>
+            <div class="form-group">
+              <div class="custom-control custom-switch">
+                <input type="checkbox" name="unsubscribed" value="true" id="profile-unsubscribed" class="custom-control-input">
+                <label class="custom-control-label" for="profile-unsubscribed">Отключить ежедневный отчет</label>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+          <button type="submit" class="btn btn-primary" form="profile-form">Сохранить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="plugins/jquery/jquery.min.js"></script>
   <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="plugins/jquery-ui/jquery-ui.min.js"></script>
@@ -190,11 +236,17 @@
   <script>
     $(document).ready(function () {
       // Перенаправление, если не залогинен
+      const fillUserFields = (user) => {
+        $(".user-name").text(user.name);
+        $(".user-email").text(user.email);
+        $("#profile-name").val(user.name);
+        $("#profile-email").val(user.email);
+        $("#profile-unsubscribed").prop("checked", user.unsubscribed);
+      };
       if (user === null) {
         window.location.href = "login.html";
       } else {
-        $(".user-name").text(user.name);
-        $(".user-email").text(user.email);
+        fillUserFields(user);
       }
 
       // Выход из системы
@@ -206,8 +258,18 @@
         return false;
       });
 
+      // Настройки профиля
+      $("#profile-form").submit(function () {
+        put(api.users(), this).then((user) => {
+          localStorage.setItem("user", JSON.stringify(user));
+          fillUserFields(user);
+          hideModal();
+        });
+        return false;
+      });
+
       // Базовая логика для форм
-      $("form")
+      $("form:not(.manual)")
               .on("input", 'input:not([type="color"]), select, textarea', function () {
                 $(this).parents("form").submit();
               })

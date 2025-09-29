@@ -11,6 +11,7 @@ public class User {
     private Integer id;
     private String name;
     private String email;
+    private boolean isUnsubscribed;
     private Integer completed;
     private Integer uncompleted;
 }

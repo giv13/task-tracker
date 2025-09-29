@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -31,6 +32,9 @@ public class User implements UserDetails {
     @ToString.Exclude
     @JsonIgnore
     private String refresh;
+
+    @ColumnDefault("false")
+    private boolean isUnsubscribed;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

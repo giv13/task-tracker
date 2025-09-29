@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface UserRepository extends CrudRepository<User, Integer> {
     @Query("""
-        SELECT u.id, u.name, u.email,
+        SELECT u.id, u.name, u.email, u.is_unsubscribed,
                COUNT(CASE WHEN t.completed_at > :date THEN 1 END) as completed,
                COUNT(CASE WHEN t.completed_at IS NULL THEN 1 END) as uncompleted
         FROM "user" u
