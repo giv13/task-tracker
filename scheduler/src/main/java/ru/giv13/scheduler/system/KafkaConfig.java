@@ -15,7 +15,7 @@ public class KafkaConfig {
     private final Map<String, String> configs = Map.of("min.insync.replicas", "2");
 
     @Bean
-    public NewTopic userRegisteredTopic() {
+    public NewTopic userTaskSummaryTopic() {
         return new NewTopic(userTaskSummaryTopicName, 3, (short) 3).configs(configs);
     }
 }
