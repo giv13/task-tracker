@@ -194,7 +194,7 @@
           </div>
         </div>
         <div class="modal-body">
-          <form action="#" method="post" id="profile-form" class="mt-3 manual">
+          <form action="#" method="post" id="profile-form" class="mt-3">
             <div class="form-group">
               <label for="profile-name">Имя</label>
               <input type="text" name="name" id="profile-name" class="form-control">
@@ -209,7 +209,14 @@
             </div>
             <div class="form-group">
               <label for="profile-password-confirmation">Повторите новый пароль</label>
-              <input type="password" name="passwordConfirmation" id="profile-password-confirmation" class="form-control">
+              <div class="row">
+                <div class="col-9">
+                  <input type="password" name="passwordConfirmation" id="profile-password-confirmation" class="form-control">
+                </div>
+                <div class="col-3">
+                  <button type="submit" class="btn btn-primary" form="profile-form">Сохранить</button>
+                </div>
+              </div>
             </div>
             <div class="form-group">
               <div class="custom-control custom-switch">
@@ -218,10 +225,6 @@
               </div>
             </div>
           </form>
-        </div>
-        <div class="modal-footer justify-content-between">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
-          <button type="submit" class="btn btn-primary" form="profile-form">Сохранить</button>
         </div>
       </div>
     </div>
@@ -259,19 +262,23 @@
       });
 
       // Настройки профиля
-      $("#profile-form").submit(function () {
+      $("#profile-form").submit(function (e) {
         put(api.users(), this).then((user) => {
           localStorage.setItem("user", JSON.stringify(user));
           fillUserFields(user);
-          hideModal();
+          if (!!e.originalEvent) hideModal();
         });
         return false;
       });
 
       // Базовая логика для форм
-      $("form:not(.manual)")
-              .on("input", 'input:not([type="color"]), select, textarea', function () {
-                $(this).parents("form").submit();
+      let timerId;
+      $("form")
+              .on("input", 'input:not([type="color"]):not([type="password"]), select, textarea', function () {
+                clearTimeout(timerId);
+                timerId = setTimeout(() => {
+                  $(this).parents("form").submit();
+                }, 500);
               })
               .on("change", 'input[type="color"]', function () {
                 $(this).parents("form").submit();
