@@ -11,3 +11,5 @@ databaseChangeLog:
       file: db/changelog/1.x/update-task-table-add-timestamps.yaml
   - include:
       file: db/changelog/1.x/update-user-table-add-is-unsubscribed.yaml
+  - include:
+      file: db/changelog/1.x/update-user-table-add-timezone.yaml

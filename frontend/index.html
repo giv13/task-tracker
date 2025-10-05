@@ -28,8 +28,8 @@
             <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
               <li class="user-header bg-primary">
                 <p>
-                  <span class="user-name"></span>
-                  <small class="user-email"></small>
+                  <span class="user-email"></span>
+                  <small class="user-timezone"></small>
                 </p>
               </li>
               <li class="user-footer">
@@ -204,6 +204,10 @@
               <input type="text" name="E-mail" id="profile-email" class="form-control" readonly>
             </div>
             <div class="form-group">
+              <label for="profile-timezone">Часовой пояс</label>
+              <select name="timezone" id="profile-timezone" class="custom-select"></select>
+            </div>
+            <div class="form-group">
               <label for="profile-password">Новый пароль</label>
               <input type="password" name="password" id="profile-password" class="form-control">
             </div>
@@ -239,17 +243,19 @@
   <script>
     $(document).ready(function () {
       // Перенаправление, если не залогинен
-      const fillUserFields = (user) => {
+      const fillUserFields = () => {
+        const user = getUser();
         $(".user-name").text(user.name);
         $(".user-email").text(user.email);
+        $(".user-timezone").text(user.timezone);
         $("#profile-name").val(user.name);
         $("#profile-email").val(user.email);
         $("#profile-unsubscribed").prop("checked", user.unsubscribed);
       };
-      if (user === null) {
+      if (getUser() === null) {
         window.location.href = "login.html";
       } else {
-        fillUserFields(user);
+        fillUserFields();
       }
 
       // Выход из системы
@@ -261,11 +267,24 @@
         return false;
       });
 
-      // Настройки профиля
+      // Часовые пояса
+      get(api.timezones()).then((t) => {
+        Object.values(t).forEach((timezone) => {
+          $('[name="timezone"]').append('<option value="' + timezone + '">' + timezone + "</option>");
+        });
+        $('[name="timezone"] [value="' + getUser().timezone + '"]').prop("selected", true);
+      });
+
+// Настройки профиля
       $("#profile-form").submit(function (e) {
         put(api.users(), this).then((user) => {
-          localStorage.setItem("user", JSON.stringify(user));
-          fillUserFields(user);
+          if (getUser().timezone !== user.timezone) {
+            getCategories().then(() => {
+              drawCategories();
+            });
+          }
+          setUser(user);
+          fillUserFields();
           if (!!e.originalEvent) hideModal();
         });
         return false;

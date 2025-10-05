@@ -40,12 +40,12 @@
   <script src="js/api.js"></script>
   <script>
     $(document).ready(function () {
-      if (user !== null) {
+      if (getUser() !== null) {
         window.location.href = "/";
       }
       $("form").submit(function () {
-        post(api.login(), this).then((r) => {
-          localStorage.setItem("user", JSON.stringify(r));
+        post(api.login(), this).then((user) => {
+          setUser(user);
           window.location.href = "/";
         });
         return false;

@@ -3,6 +3,7 @@ package ru.giv13.tasktracker.user;
 import jakarta.validation.GroupSequence;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,6 +34,11 @@ public class UserRequestDto implements PasswordConfirmable {
     @Size(max=50, groups = FirstGroupLogin.class)
     @Unique(repository=UserRepository.class, field="email", groups = SecondGroup.class)
     private String email;
+
+    @NotBlank(groups = FirstGroupRegister.class)
+    @Size(max=9, groups = FirstGroupRegister.class)
+    @Pattern(regexp = "^UTC[+-](?:0[0-9]|1[0-4]):(?:00|15|30|45)$", message = "Должно быть часовым поясом", groups = FirstGroupRegister.class)
+    private String timezone;
 
     @NotBlank(groups = FirstGroupLogin.class)
     @Password(groups = FirstGroupRegister.class)

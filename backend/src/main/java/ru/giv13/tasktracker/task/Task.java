@@ -11,6 +11,8 @@ import ru.giv13.tasktracker.color.Color;
 import ru.giv13.tasktracker.user.User;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Entity
 @Data
@@ -26,7 +28,7 @@ public class Task {
     private String notes;
 
     @ColumnDefault("0")
-    private Integer index;
+    private Integer index = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_task_color_id"))
@@ -53,5 +55,15 @@ public class Task {
 
     public boolean getDone() {
         return completedAt != null;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        if (createdAt == null) return null;
+        return createdAt.atZone(ZoneId.of(user.getTimezone())).toLocalDateTime();
+    }
+
+    public LocalDateTime getCompletedAt() {
+        if (completedAt == null) return null;
+        return completedAt.atZone(ZoneId.of(user.getTimezone())).toLocalDateTime();
     }
 }

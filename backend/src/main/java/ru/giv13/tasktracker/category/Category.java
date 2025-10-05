@@ -26,7 +26,7 @@ public class Category {
     private String name;
 
     @ColumnDefault("0")
-    private Integer index;
+    private Integer index = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_category_color_id"))

@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import ru.giv13.tasktracker.color.ColorResponseDto;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -23,7 +23,7 @@ public class TaskResponseDto {
     @JsonProperty("category")
     private Integer categoryId;
 
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
-    private Instant completedAt;
+    private LocalDateTime completedAt;
 }

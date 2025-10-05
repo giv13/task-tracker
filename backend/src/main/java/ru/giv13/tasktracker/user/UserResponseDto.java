@@ -8,5 +8,6 @@ import lombok.Setter;
 public class UserResponseDto {
     private String name;
     private String email;
+    private String timezone;
     private boolean isUnsubscribed;
 }

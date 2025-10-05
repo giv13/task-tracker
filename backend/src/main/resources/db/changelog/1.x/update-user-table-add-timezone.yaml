@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: update-user-table-add-timezone
+      author: giv13
+      changes:
+        - addColumn:
+            tableName: user
+            columns:
+              - column:
+                  name: timezone
+                  type: varchar(9)
+                  defaultValue: "UTC+00:00"
+                  constraints:
+                    nullable: false
+      rollback:
+        - dropColumn:
+            tableName: user
+            columns:
+              - column:
+                  name: timezone

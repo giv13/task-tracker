@@ -1,5 +1,3 @@
-const user = JSON.parse(localStorage.getItem("user"));
-
 const apiBaseUrl = "/api";
 
 const api = {
@@ -7,11 +5,24 @@ const api = {
     login: () => `${apiBaseUrl}/auth/login`,
     logout: () => `${apiBaseUrl}/auth/logout`,
     refresh: () => `${apiBaseUrl}/auth/refresh`,
+    timezones: () => `${apiBaseUrl}/timezones`,
     users: () => `${apiBaseUrl}/users`,
     colors: () => `${apiBaseUrl}/colors`,
     categories: () => `${apiBaseUrl}/categories`,
     tasks: () => `${apiBaseUrl}/tasks`,
 };
+
+const getUser = () => {
+    return JSON.parse(localStorage.getItem("user"));
+}
+
+const setUser = (user) => {
+    localStorage.setItem("user", JSON.stringify(user));
+}
+
+const removeUser = () => {
+    localStorage.removeItem("user");
+}
 
 const toast = (title, body, cls) => {
     $(document).Toasts("create", {
@@ -80,7 +91,7 @@ const request = async (url, method, form) => {
         })
         .catch((r) => {
             const error = r.error;
-            if (r.status === 401 && user !== null) {
+            if (r.status === 401 && getUser() !== null) {
                 if (!isRefreshRequesting) {
                     isRefreshRequesting = true;
                     fetch(api.refresh(), {
@@ -92,7 +103,7 @@ const request = async (url, method, form) => {
                             if (r.status === 200) {
                                 requestsToRefresh.forEach((r) => r());
                             } else {
-                                localStorage.removeItem("user");
+                                removeUser();
                                 window.location.href = "login.html";
                             }
                         })

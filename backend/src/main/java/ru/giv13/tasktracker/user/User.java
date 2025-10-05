@@ -24,6 +24,10 @@ public class User implements UserDetails {
     @Column(length = 50, nullable = false, unique = true)
     private String email;
 
+    @Column(length = 9, nullable = false)
+    @ColumnDefault("'UTC+00:00'")
+    private String timezone = "UTC+00:00";
+
     @Column(length = 100, nullable = false)
     @ToString.Exclude
     @JsonIgnore
@@ -34,7 +38,7 @@ public class User implements UserDetails {
     private String refresh;
 
     @ColumnDefault("false")
-    private boolean isUnsubscribed;
+    private boolean isUnsubscribed = false;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

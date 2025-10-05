@@ -25,6 +25,11 @@
             <input type="text" name="email" class="form-control" placeholder="E-mail">
           </div>
           <div class="form-group">
+            <select name="timezone" class="custom-select">
+              <option value="" disabled selected hidden>Часовой пояс</option>
+            </select>
+          </div>
+          <div class="form-group">
             <input type="password" name="password" class="form-control" placeholder="Пароль">
           </div>
           <div class="form-group">
@@ -44,9 +49,15 @@
   <script src="js/api.js"></script>
   <script>
     $(document).ready(function () {
+      get(api.timezones()).then((t) => {
+        Object.values(t).forEach((timezone) => {
+          $('[name="timezone"]').append('<option value="' + timezone + '">' + timezone + "</option>");
+        });
+      });
+
       $("form").submit(function () {
-        post(api.register(), this).then((r) => {
-          localStorage.setItem("user", JSON.stringify(r));
+        post(api.register(), this).then((user) => {
+          setUser(user);
           window.location.href = "/";
         });
         return false;
