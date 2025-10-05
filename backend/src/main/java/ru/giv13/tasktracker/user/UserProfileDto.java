@@ -24,4 +24,8 @@ public class UserProfileDto implements PasswordConfirmable {
 
     @NotNull
     private boolean isUnsubscribed;
+
+    public void setPassword(String password) {
+        this.password = password == null || password.isBlank() ? null : password;
+    }
 }

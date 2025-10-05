@@ -38,15 +38,14 @@ public class UserService implements UserDetailsService, PrincipalProvider {
 
     @Transactional
     public UserResponseDto update(UserProfileDto userProfileDto) {
-        boolean isPasswordChanged = userProfileDto.getPassword() != null && !userProfileDto.getPassword().isBlank();
         User user = getPrincipal();
         mapper.map(userProfileDto, user);
-        if (isPasswordChanged) {
+        if (userProfileDto.getPassword() != null) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
         userRepository.save(user);
 
-        if (isPasswordChanged) {
+        if (userProfileDto.getPassword() != null) {
             UserPasswordChangedEvent userPasswordChangedEvent = new UserPasswordChangedEvent()
                     .setName(user.getName())
                     .setEmail(user.getEmail())
