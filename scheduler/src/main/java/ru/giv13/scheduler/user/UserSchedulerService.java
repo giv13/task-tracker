@@ -7,8 +7,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ru.giv13.common.event.UserTaskSummaryEvent;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -20,9 +18,9 @@ public class UserSchedulerService {
     @Value("${spring.kafka.topics.user.task-summary}")
     private String userTaskSummaryTopicName;
 
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 */30 * * * ?")
     public void taskSummaries() {
-        List<User> users = userRepository.findAllWithTaskSummaries(Instant.now().minus(Duration.ofDays(1)));
+        List<User> users = userRepository.findAllWithTaskSummaries();
         for (User user : users) {
             if (!user.getCompleted().isEmpty() || !user.getUncompleted().isEmpty()) {
                 UserTaskSummaryEvent userTaskSummaryEvent = new UserTaskSummaryEvent()
