@@ -8,8 +8,8 @@ databaseChangeLog:
             columns:
               - column:
                   name: timezone
-                  type: varchar(9)
-                  defaultValue: "UTC+00:00"
+                  type: varchar(50)
+                  defaultValue: "UTC"
                   constraints:
                     nullable: false
       rollback:

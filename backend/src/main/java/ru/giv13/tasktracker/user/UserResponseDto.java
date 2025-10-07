@@ -9,5 +9,6 @@ public class UserResponseDto {
     private String name;
     private String email;
     private String timezone;
+    private String timezoneOffset;
     private boolean isUnsubscribed;
 }

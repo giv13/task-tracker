@@ -7,6 +7,7 @@
   <link rel="icon" type="image/svg+xml" href="img/logo.svg">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+  <link rel="stylesheet" href="plugins/select2/css/select2.min.css">
   <link rel="stylesheet" href="css/adminlte.min.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -45,14 +46,33 @@
 
   <script src="plugins/jquery/jquery.min.js"></script>
   <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="plugins/select2/js/select2.full.min.js"></script>
   <script src="js/adminlte.min.js"></script>
   <script src="js/api.js"></script>
   <script>
     $(document).ready(function () {
-      get(api.timezones()).then((t) => {
-        Object.values(t).forEach((timezone) => {
-          $('[name="timezone"]').append('<option value="' + timezone + '">' + timezone + "</option>");
+      get(api.timezones()).then((timezones) => {
+        const timezone = $('[name="timezone"]');
+        Object.entries(timezones).forEach(([name, value]) => {
+          timezone.append('<option value="' + value + '">' + name + "</option>");
         });
+        timezone
+                .find('[value="' + Intl.DateTimeFormat().resolvedOptions().timeZone + '"]')
+                .prop("selected", true)
+                .end()
+                .select2({
+                  width: "100%",
+                  placeholder: timezone.find('[value=""]').html(),
+                  templateResult: (state) => {
+                    return $(
+                            '<span><small style="opacity: 0.5">' +
+                            state.text.split(" ")[0] +
+                            "</small> " +
+                            state.text.split(" ")[1] +
+                            "</span>",
+                    );
+                  },
+                });
       });
 
       $("form").submit(function () {

@@ -4,22 +4,26 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 @Service
 public class TimeZoneService {
-    public List<String> getAll() {
+    public Map<String, String> getAll() {
         LocalDateTime now = LocalDateTime.now();
         return ZoneId
                 .getAvailableZoneIds()
                 .stream()
-                .map(zoneId -> String.format(
-                        "%s%s",
-                        "UTC",
-                        now.atZone(ZoneId.of(zoneId)).getOffset().getId().replace("Z", "+00:00")
-                ))
-                .distinct()
-                .sorted()
-                .toList();
+                .collect(Collectors.toMap(
+                        zoneId -> String.format(
+                                "UTC%s %s",
+                                now.atZone(ZoneId.of(zoneId)).getOffset().getId().replace("Z", "+00:00"),
+                                zoneId
+                        ),
+                        zoneId -> zoneId,
+                        (oldValue, newValue) -> oldValue,
+                        TreeMap::new
+                ));
     }
 }

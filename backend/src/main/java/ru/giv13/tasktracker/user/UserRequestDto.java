@@ -3,14 +3,10 @@ package ru.giv13.tasktracker.user;
 import jakarta.validation.GroupSequence;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import ru.giv13.tasktracker.validation.Password;
-import ru.giv13.tasktracker.validation.PasswordConfirmable;
-import ru.giv13.tasktracker.validation.PasswordConfirmation;
-import ru.giv13.tasktracker.validation.Unique;
+import ru.giv13.tasktracker.validation.*;
 
 @Getter
 @Setter
@@ -36,8 +32,8 @@ public class UserRequestDto implements PasswordConfirmable {
     private String email;
 
     @NotBlank(groups = FirstGroupRegister.class)
-    @Size(max=9, groups = FirstGroupRegister.class)
-    @Pattern(regexp = "^UTC[+-](?:0[0-9]|1[0-4]):(?:00|15|30|45)$", message = "Должно быть часовым поясом", groups = FirstGroupRegister.class)
+    @Size(max=50, groups = FirstGroupRegister.class)
+    @Timezone(groups = FirstGroupRegister.class)
     private String timezone;
 
     @NotBlank(groups = FirstGroupLogin.class)

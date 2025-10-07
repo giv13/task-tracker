@@ -8,6 +8,8 @@ import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Collection;
 
 @Entity
@@ -24,9 +26,9 @@ public class User implements UserDetails {
     @Column(length = 50, nullable = false, unique = true)
     private String email;
 
-    @Column(length = 9, nullable = false)
-    @ColumnDefault("'UTC+00:00'")
-    private String timezone = "UTC+00:00";
+    @Column(length = 50, nullable = false)
+    @ColumnDefault("'UTC'")
+    private String timezone = "UTC";
 
     @Column(length = 100, nullable = false)
     @ToString.Exclude
@@ -48,5 +50,9 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         return email;
+    }
+
+    public String getTimezoneOffset() {
+        return "UTC" + LocalDateTime.now().atZone(ZoneId.of(timezone)).getOffset().getId().replace("Z", "+00:00");
     }
 }
