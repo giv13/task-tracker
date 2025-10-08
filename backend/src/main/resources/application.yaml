@@ -53,3 +53,10 @@ security:
     refresh:
       expiration: 30d
       token-name: refresh
+
+server:
+  forward-headers-strategy: framework
+
+springdoc:
+  api-docs:
+    path: /swagger-ui/json

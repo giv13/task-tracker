@@ -10,16 +10,25 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import java.util.*;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler implements ResponseBodyAdvice<Object> {
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+    private final String[] excludedPaths = {
+            "/swagger-ui/**",
+            "/api/swagger-ui/**"
+    };
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Response<Map<String, List<String>>> onMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
         Map<String, List<String>> errors = new HashMap<>();
@@ -57,6 +66,16 @@ public class GlobalExceptionHandler implements ResponseBodyAdvice<Object> {
 
     @Override
     public boolean supports(@NonNull MethodParameter returnType, @NonNull Class converterType) {
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes == null) {
+            return false;
+        }
+        String requestUri = attributes.getRequest().getRequestURI();
+        for (String pattern : excludedPaths) {
+            if (pathMatcher.match(pattern, requestUri)) {
+                return false;
+            }
+        }
         return true;
     }
 
