@@ -50,7 +50,13 @@ public class Task {
     private Instant completedAt;
 
     public void setDone(boolean done) {
-        completedAt = done ? Instant.now() : null;
+        if (done) {
+            if (completedAt == null) {
+                completedAt = Instant.now();
+            }
+        } else {
+            completedAt = null;
+        }
     }
 
     public boolean getDone() {
