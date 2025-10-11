@@ -20,6 +20,4 @@ WORKDIR /app
 
 COPY --from=builder /app/target/*.jar mailer.jar
 
-EXPOSE 8080
-
 ENTRYPOINT ["java", "-jar", "mailer.jar"]
