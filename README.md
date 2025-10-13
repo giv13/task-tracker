@@ -9,31 +9,32 @@
 
 ### Backend
 
-![Java](https://img.shields.io/badge/Java-ED8B00.svg?logo=openjdk&logoColor=fff)&nbsp;
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-6DB33F?logo=springboot&logoColor=fff)&nbsp;
-![Spring Security (JWT)](https://img.shields.io/badge/Spring%20Security%20(JWT)-6DB33F?logo=springsecurity&logoColor=fff)&nbsp;
-![Spring Web](https://img.shields.io/badge/Spring%20Web-6DB33F?logo=spring&logoColor=fff)&nbsp;
-![Spring Data JPA](https://img.shields.io/badge/Spring%20Data%20JPA-6DB33F?logo=spring&logoColor=fff)&nbsp;
-![Spring Data JDBC](https://img.shields.io/badge/Spring%20Data%20JDBC-6DB33F?logo=spring&logoColor=fff)&nbsp;
-![Spring for Apache Kafka](https://img.shields.io/badge/Spring%20for%20Apache%20Kafka-6DB33F?logo=spring&logoColor=fff)&nbsp;
-![Spring Scheduler](https://img.shields.io/badge/Spring%20Scheduler-6DB33F?logo=spring&logoColor=fff)&nbsp;
-![Spring Mail](https://img.shields.io/badge/Spring%20Mail-6DB33F?logo=spring&logoColor=fff)&nbsp;
-![Hibernate](https://img.shields.io/badge/Hibernate-59666C?logo=hibernate&logoColor=fff)&nbsp;
-![Postgres](https://img.shields.io/badge/Postgres-316192.svg?logo=postgresql&logoColor=fff)&nbsp;
-![Liquibase](https://img.shields.io/badge/Liquibase-2962FF.svg?logo=liquibase&logoColor=fff)&nbsp;
-![Maven](https://img.shields.io/badge/Maven-C71A36?logo=apachemaven&logoColor=fff)&nbsp;
-![Kafka](https://img.shields.io/badge/Kafka-231F20?logo=apachekafka&logoColor=fff)&nbsp;
-![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=fff)&nbsp;
-![Git](https://img.shields.io/badge/Git-F05032?logo=git&logoColor=fff)&nbsp;
-![OpenAPI](https://img.shields.io/badge/OpenAPI-6BA539?logo=openapiinitiative&logoColor=white)&nbsp;
+![Java](https://img.shields.io/badge/Java-ED8B00?logo=openjdk&logoColor=fff)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-6DB33F?logo=springboot&logoColor=fff)
+![Spring Security (JWT)](https://img.shields.io/badge/Spring%20Security%20(JWT)-6DB33F?logo=springsecurity&logoColor=fff)
+![Spring Web](https://img.shields.io/badge/Spring%20Web-6DB33F?logo=spring&logoColor=fff)
+![Spring Data JPA](https://img.shields.io/badge/Spring%20Data%20JPA-6DB33F?logo=spring&logoColor=fff)
+![Spring Data JDBC](https://img.shields.io/badge/Spring%20Data%20JDBC-6DB33F?logo=spring&logoColor=fff)
+![Spring for Apache Kafka](https://img.shields.io/badge/Spring%20for%20Apache%20Kafka-6DB33F?logo=spring&logoColor=fff)
+![Spring Scheduler](https://img.shields.io/badge/Spring%20Scheduler-6DB33F?logo=spring&logoColor=fff)
+![Spring Mail](https://img.shields.io/badge/Spring%20Mail-6DB33F?logo=spring&logoColor=fff)
+![Hibernate](https://img.shields.io/badge/Hibernate-59666C?logo=hibernate&logoColor=fff)
+![Postgres](https://img.shields.io/badge/Postgres-316192?logo=postgresql&logoColor=fff)
+![Liquibase](https://img.shields.io/badge/Liquibase-2962FF?logo=liquibase&logoColor=fff)
+![Maven](https://img.shields.io/badge/Maven-C71A36?logo=apachemaven&logoColor=fff)
+![Kafka](https://img.shields.io/badge/Kafka-231F20?logo=apachekafka&logoColor=fff)
+![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=fff)
+![Git](https://img.shields.io/badge/Git-F05032?logo=git&logoColor=fff)
+![CI/CD](https://img.shields.io/badge/CI/CD-3B00B9?logo=internetcomputer&logoColor=fff)
+![OpenAPI](https://img.shields.io/badge/OpenAPI-6BA539?logo=openapiinitiative&logoColor=white)
 ![Swagger](https://img.shields.io/badge/Swagger-85EA2D?logo=swagger&logoColor=000)
 
 ### Frontend
 
-![Nginx](https://img.shields.io/badge/Nginx-009639?logo=nginx&logoColor=fff)&nbsp;
-![HTML](https://img.shields.io/badge/HTML-E34F26?logo=html5&logoColor=fff)&nbsp;
-![CSS](https://img.shields.io/badge/CSS-639?logo=css&logoColor=fff)&nbsp;
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=000)&nbsp;
+![Nginx](https://img.shields.io/badge/Nginx-009639?logo=nginx&logoColor=fff)
+![HTML](https://img.shields.io/badge/HTML-E34F26?logo=html5&logoColor=fff)
+![CSS](https://img.shields.io/badge/CSS-639?logo=css&logoColor=fff)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=000)
 ![jQuery](https://img.shields.io/badge/jQuery-0769AD?logo=jquery&logoColor=fff)
 
 ## Особенности
@@ -45,8 +46,9 @@
 - Стандартизация ответов от бэкенда (RestControllerAdvice).
 - Использование Liquibase для миграций.
 - Swagger для API-документации c рабочим решением авторизации на основе JWT.
-- Adminer (веб-интерфейс для управления базами данных) и Kafbat UI (веб-интерфейс для Apache Kafka).
+- Adminer (веб-интерфейс для управления базами данных) и Kafka UI (веб-интерфейс для Apache Kafka).
 - Сборка приложения осуществляется через Docker. При этом наружу торчит только Nginx, который выступает в роли обратного прокси.
+- CI/CD с помощью GitHub Actions. Сборка образов, push образов в Docker Hub и развертывание кода на сервере полностью автоматизированы.
 
 ## Что улучшено по сравнению с [ТЗ](sow.md)
 
