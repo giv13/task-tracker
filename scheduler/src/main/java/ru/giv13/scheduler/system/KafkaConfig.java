@@ -16,6 +16,6 @@ public class KafkaConfig {
 
     @Bean
     public NewTopic userTaskSummaryTopic() {
-        return new NewTopic(userTaskSummaryTopicName, 3, (short) 3).configs(configs);
+        return new NewTopic(userTaskSummaryTopicName, 2, (short) 2).configs(configs);
     }
 }

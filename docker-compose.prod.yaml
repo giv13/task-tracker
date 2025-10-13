@@ -1,0 +1,25 @@
+x-broker: &broker
+  environment:
+    KAFKA_HEAP_OPTS: -Xmx416M -Xms224M
+  deploy:
+    resources:
+      limits:
+        memory: 448m
+      reservations:
+        memory: 256m
+
+services:
+  frontend:
+    image: ${DOCKERHUB_USER}/task-tracker-frontend:latest
+    volumes: !reset []
+  backend:
+    image: ${DOCKERHUB_USER}/task-tracker-backend:latest
+    build: !reset null
+  scheduler:
+    image: ${DOCKERHUB_USER}/task-tracker-scheduler:latest
+    build: !reset null
+  mailer:
+    image: ${DOCKERHUB_USER}/task-tracker-mailer:latest
+    build: !reset null
+  broker-1: *broker
+  broker-2: *broker

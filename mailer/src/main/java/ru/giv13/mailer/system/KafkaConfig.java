@@ -25,7 +25,7 @@ public class KafkaConfig {
 
     @Bean
     public NewTopic userDltTopic() {
-        return new NewTopic(userDltTopicName, 1, (short) 3).configs(configs);
+        return new NewTopic(userDltTopicName, 1, (short) 2).configs(configs);
     }
 
     @Bean

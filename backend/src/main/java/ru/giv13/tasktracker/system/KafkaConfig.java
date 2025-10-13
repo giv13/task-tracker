@@ -19,11 +19,11 @@ public class KafkaConfig {
 
     @Bean
     public NewTopic userRegisteredTopic() {
-        return new NewTopic(userRegisteredTopicName, 1, (short) 3).configs(configs);
+        return new NewTopic(userRegisteredTopicName, 1, (short) 2).configs(configs);
     }
 
     @Bean
     public NewTopic userPasswordChangedTopic() {
-        return new NewTopic(userPasswordChangedTopicName, 1, (short) 3).configs(configs);
+        return new NewTopic(userPasswordChangedTopicName, 1, (short) 2).configs(configs);
     }
 }
