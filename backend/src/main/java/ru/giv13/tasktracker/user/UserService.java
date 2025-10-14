@@ -30,6 +30,11 @@ public class UserService implements UserDetailsService, PrincipalProvider {
     @Value("${spring.kafka.topics.user.password-changed}")
     private String userPasswordChangedTopicName;
 
+    @Transactional(readOnly = true)
+    public User loadUserById(Integer id) {
+        return userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("Пользователь с ID=" + id + " не найден"));
+    }
+
     @Override
     @Transactional(readOnly = true)
     public User loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -38,7 +43,7 @@ public class UserService implements UserDetailsService, PrincipalProvider {
 
     @Transactional
     public UserResponseDto update(UserProfileDto userProfileDto) {
-        User user = getPrincipal();
+        User user = loadUserById(getPrincipalId());
         mapper.map(userProfileDto, user);
         if (userProfileDto.getPassword() != null) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));

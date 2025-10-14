@@ -1,6 +1,5 @@
 package ru.giv13.tasktracker.security;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -16,7 +15,6 @@ import javax.crypto.SecretKey;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -54,7 +52,7 @@ public class JwtService {
         eraseCookie(jwtRefreshTokenName);
     }
 
-    private void eraseCookie(String tokenName) {
+    public void eraseCookie(String tokenName) {
         Cookie refreshCookie = new Cookie(tokenName, "");
         refreshCookie.setMaxAge(0);
         refreshCookie.setPath("/");
@@ -70,32 +68,35 @@ public class JwtService {
     private String generateToken(User user, Duration expiration) {
         return Jwts
                 .builder()
-                .subject(user.getUsername())
-                .issuedAt(new Date(System.currentTimeMillis()))
+                .subject(user.getId().toString())
                 .expiration(new Date(System.currentTimeMillis() + expiration.toMillis()))
                 .signWith(getSigningKey(), Jwts.SIG.HS256)
                 .compact();
     }
 
-    public boolean isTokenValid(String token, User user) {
-        return extractUsername(token).equals(user.getUsername()) && user.getRefresh() != null && !isTokenExpired(token);
+    public boolean isTokenValid(String token) {
+        try {
+            Jwts
+                    .parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
-    private boolean isTokenExpired(String token) {
-        return extractClaim(token, Claims::getExpiration).before(new Date());
-    }
-
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
-    }
-
-    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractClaims(token);
-        return claimsResolver.apply(claims);
-    }
-
-    private Claims extractClaims(String token) {
-        return Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(token).getPayload();
+    public Integer extractUserId(String token) {
+        return Integer.valueOf(
+                Jwts
+                        .parser()
+                        .verifyWith(getSigningKey())
+                        .build()
+                        .parseSignedClaims(token)
+                        .getPayload()
+                        .getSubject()
+        );
     }
 
     private SecretKey getSigningKey() {

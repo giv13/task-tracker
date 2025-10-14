@@ -30,7 +30,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: refresh
-                  type: varchar(255)
+                  type: varchar(100)
       rollback:
         - dropTable:
             tableName: user

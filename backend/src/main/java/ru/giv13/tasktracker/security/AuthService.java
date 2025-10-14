@@ -16,6 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.giv13.common.event.UserRegisteredEvent;
 import ru.giv13.tasktracker.user.*;
 
+import java.security.MessageDigest;
+import java.util.HexFormat;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -61,24 +64,42 @@ public class AuthService {
     }
 
     private UserResponseDto auth(User user) {
-        user.setRefresh(jwtService.generateCookie(user));
+        setRefresh(user);
         return modelMapper.map(userRepository.save(user), UserResponseDto.class);
     }
 
     public void refresh(HttpServletRequest request) throws JwtException {
         String refreshToken = jwtService.getCookie(request, jwtRefreshTokenName);
-        if (refreshToken != null) {
-            String username = jwtService.extractUsername(refreshToken);
-            if (username != null) {
-                User user = userService.loadUserByUsername(username);
-                if (jwtService.isTokenValid(refreshToken, user) && refreshToken.equals(user.getRefresh())) {
-                    user.setRefresh(jwtService.generateCookie(user));
+        if (refreshToken != null && jwtService.isTokenValid(refreshToken)) {
+            Integer userId = jwtService.extractUserId(refreshToken);
+            if (userId != null) {
+                User user = userService.loadUserById(userId);
+                if (user.getRefresh() != null && passwordEncoder.matches(getHash(refreshToken), user.getRefresh())) {
+                    setRefresh(user);
                     userRepository.save(user);
                     return;
                 }
             }
+        } else {
+            jwtService.eraseCookie();
         }
         throw new JwtException("Просроченный или недействительный Refresh-токен");
+    }
+
+    private void setRefresh(User user) {
+        String refreshToken = jwtService.generateCookie(user);
+        String hashedRefreshToken = getHash(refreshToken);
+        user.setRefresh(passwordEncoder.encode(hashedRefreshToken));
+    }
+
+    private String getHash(String input) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(input.getBytes());
+            return HexFormat.of().formatHex(hash);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void logout() {

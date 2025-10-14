@@ -14,7 +14,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.servlet.HandlerMapping;
-import ru.giv13.tasktracker.user.User;
 
 import java.util.Map;
 
@@ -49,7 +48,7 @@ public class UniqueValidator implements ConstraintValidator<Unique, Object> {
             spelContext.setVariable("value", value);
             spelContext.setVariable("id", getIdFromRequest());
             if (userConstraint) {
-                spelContext.setVariable("userId", ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId());
+                spelContext.setVariable("userId", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
             }
             Expression expression = new SpelExpressionParser().parseExpression(spelExpression);
             Object result = expression.getValue(spelContext);

@@ -6,6 +6,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.giv13.tasktracker.security.PrincipalProvider;
+import ru.giv13.tasktracker.user.UserRepository;
 
 import java.util.List;
 
@@ -13,6 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ColorService implements PrincipalProvider {
     private final ColorRepository colorRepository;
+    private final UserRepository userRepository;
     private final ModelMapper mapper;
 
     @Transactional(readOnly = true)
@@ -23,7 +25,7 @@ public class ColorService implements PrincipalProvider {
     @Transactional
     public ColorResponseDto create(ColorRequestDto colorRequestDto) {
         Color color = mapper.map(colorRequestDto, Color.class);
-        color.setUser(getPrincipal());
+        color.setUser(userRepository.getReferenceById(getPrincipalId()));
         return mapper.map(colorRepository.save(color), ColorResponseDto.class);
     }
 

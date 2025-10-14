@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.giv13.tasktracker.color.ColorRepository;
 import ru.giv13.tasktracker.security.PrincipalProvider;
+import ru.giv13.tasktracker.user.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +17,7 @@ import java.util.Optional;
 public class CategoryService implements PrincipalProvider {
     private final CategoryRepository categoryRepository;
     private final ColorRepository colorRepository;
+    private final UserRepository userRepository;
     private final ModelMapper mapper;
 
     @Transactional(readOnly = true)
@@ -28,7 +30,7 @@ public class CategoryService implements PrincipalProvider {
         Category category = mapper.map(categoryRequestDto, Category.class);
         category.setIndex(categoryRepository.getNextIndexByUserId(getPrincipalId()));
         category.setColor(categoryRequestDto.getColor() == null ? null : colorRepository.findByIdAndUserId(categoryRequestDto.getColor(), getPrincipalId()).orElse(null));
-        category.setUser(getPrincipal());
+        category.setUser(userRepository.getReferenceById(getPrincipalId()));
         return mapper.map(categoryRepository.save(category), CategoryResponseDto.class);
     }
 

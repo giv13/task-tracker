@@ -9,6 +9,7 @@ import ru.giv13.tasktracker.category.Category;
 import ru.giv13.tasktracker.category.CategoryRepository;
 import ru.giv13.tasktracker.color.ColorRepository;
 import ru.giv13.tasktracker.security.PrincipalProvider;
+import ru.giv13.tasktracker.user.UserRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +17,7 @@ public class TaskService implements PrincipalProvider {
     private final TaskRepository taskRepository;
     private final CategoryRepository categoryRepository;
     private final ColorRepository colorRepository;
+    private final UserRepository userRepository;
     private final ModelMapper mapper;
 
     @Transactional
@@ -25,7 +27,7 @@ public class TaskService implements PrincipalProvider {
         task.setIndex(taskRepository.getNextIndexByCategoryId(category.getId()));
         task.setColor(taskRequestDto.getColor() == null ? null : colorRepository.findByIdAndUserId(taskRequestDto.getColor(), getPrincipalId()).orElse(null));
         task.setCategory(category);
-        task.setUser(getPrincipal());
+        task.setUser(userRepository.getReferenceById(getPrincipalId()));
         return mapper.map(taskRepository.save(task), TaskResponseDto.class);
     }
 

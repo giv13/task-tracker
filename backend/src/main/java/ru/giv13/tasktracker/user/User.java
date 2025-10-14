@@ -35,6 +35,7 @@ public class User implements UserDetails {
     @JsonIgnore
     private String password;
 
+    @Column(length = 100)
     @ToString.Exclude
     @JsonIgnore
     private String refresh;
