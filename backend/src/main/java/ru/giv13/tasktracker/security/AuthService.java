@@ -46,6 +46,7 @@ public class AuthService {
     public UserResponseDto register(UserRequestDto userRequestDto) {
         User user = modelMapper.map(userRequestDto, User.class);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
         UserResponseDto userResponseDto = auth(user);
 
         UserRegisteredEvent userRegisteredEvent = new UserRegisteredEvent()
